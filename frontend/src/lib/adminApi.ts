@@ -1,11 +1,9 @@
-import { API_BASE_URL } from "./api";
 import type { Category, CustomOrder, Order, OrderStatus, Product, Settings } from "./types";
 
 async function adminFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const isFormData = options.body instanceof FormData;
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(path, {
     ...options,
-    credentials: "include",
     headers: {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...options.headers,

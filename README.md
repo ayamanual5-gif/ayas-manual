@@ -1,37 +1,92 @@
-# Aya's Manual — Local Prototype
+# Aya's Manual
 
-مشروع محلي كامل لمتجر "Aya's Manual" للكروشيه اليدوي، مبني على تصميم ملف `ayas-manual-3.html` الأصلي (نفس الألوان، الخطوط، ودعم عربي/إنجليزي RTL/LTR)، بالإضافة للوحة تحكم أدمين كاملة لإدارة المتجر. المشروع مقسّم لفولدرين مستقلين:
+متجر "Aya's Manual" للكروشيه اليدوي — تطبيق **واحد** (Next.js) فيه المتجر ولوحة تحكم الأدمين والـ API كلهم مع بعض. مفيش سيرفر منفصل، مفيش تشغيل تيرمينالين، ديبلوي واحد بس.
 
 ```
 bakar/
-├── backend/    # Express + TypeScript API، بيانات مخزنة في Postgres (Neon) عبر Prisma
 └── frontend/   # Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4
+                # فيه صفحات المتجر، لوحة الأدمين، وكل الـ API routes مع بعض
 ```
 
-الباك إند شغال على قاعدة بيانات Postgres حقيقية (Neon) بدل ملفات JSON، والصور المرفوعة (منتجات + طلبات خاصة) بتتخزن على Cloudflare R2 بدل القرص المحلي — يعني جاهز للنشر على Vercel (اللي سيرفراته مالهاش تخزين ثابت).
+- **البيانات**: Postgres حقيقي (Neon) عبر Prisma.
+- **الصور** (منتجات + طلبات خاصة): Cloudflare R2.
+- **الديبلوي**: مشروع Vercel واحد بس — مفيش CORS ولا مشاكل كوكيز عبر الدومينات، لأن كل حاجة نفس السيرفر.
 
 ---
 
 ## المتطلبات
 
-- **Node.js 18.18 أو أحدث** (مطلوب لـ Next.js 16 و React 19) — تأكد إنه متثبت ومتاح في الـ PATH (`node -v`, `npm -v`).
-- **قاعدة بيانات Postgres** — المشروع مربوط بـ [Neon](https://neon.tech) حاليًا (خطة مجانية). أي مزود Postgres تاني (Vercel Postgres، Supabase، إلخ) هيشتغل نفس الشيء، بس تحطي رابط الاتصال بتاعه في `DATABASE_URL`.
+- **Node.js 18.18 أو أحدث** — تأكد إنه متثبت (`node -v`, `npm -v`).
+- **قاعدة بيانات Postgres** (مربوطة بـ [Neon](https://neon.tech) حاليًا).
+- **حساب Cloudflare** ببكت R2 مفعّل عليه Public Access.
 
 ---
 
-## 1) تشغيل الباك إند (Backend)
+## 1) التشغيل محليًا
 
 ```powershell
-cd backend
+cd frontend
 npm install
-npx prisma db push   # يجهّز الجداول في قاعدة البيانات (مرة واحدة، أو بعد أي تعديل في schema.prisma)
+npx prisma db push   # يجهّز الجداول في القاعدة (مرة واحدة، أو بعد أي تعديل في schema.prisma)
 npm run seed          # يملأ القاعدة بمنتجات/فئات/طلبات تجريبية واقعية
 npm run dev
 ```
 
-هيشتغل السيرفر على `http://localhost:4000` (البورت قابل للتعديل من `.env`).
+هيشتغل الموقع كامل (المتجر + الأدمين + الـ API) على `http://localhost:3000` — **تيرمينال واحد بس**.
 
-> ملف `backend/.env` موجود بالفعل ببيانات دخول تجريبية جاهزة (شوفي قسم "حساب الأدمين" تحت). لو مسحتيه أو عايزة تبدئي من جديد، انسخي `.env.example` وحطي فيه قيمك.
+> ملف `frontend/.env` موجود بالفعل ببيانات جاهزة (شوفي قسم "حساب الأدمين" تحت).
+
+### حساب الأدمين
+
+```
+البريد:      admin@ayasmanual.com
+كلمة المرور: Ayas@Admin123
+```
+
+⚠️ **غيّري كلمة المرور دي** قبل ما توري المشروع لأي حد أو ترفعيه أونلاين:
+
+```powershell
+npm run hash-password -- "كلمة-المرور-الجديدة"
+```
+
+انسخي الناتج والصقيه في `.env` بدل `ADMIN_PASSWORD_HASH`.
+
+⚠️ **مهم جدًا**: أي `$` في الهاش لازم يتكتب `\$` (يعني `\$2a\$10\$...`) — Next.js بيعمل توسيع لمتغيرات `$VAR` في ملفات `.env`، وهاشات bcrypt مليانة علامات `$`. لو نسيتي تعمليها escape، تسجيل الدخول هيفشل بصمت من غير أي رسالة خطأ واضحة.
+
+---
+
+## 2) هيكل المشروع
+
+```
+frontend/
+├── prisma/
+│   └── schema.prisma          # Product, Category, Order, CustomOrder, Settings
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx         # Root: fonts + Toast
+│   │   ├── (site)/            # المتجر (Header/Footer/Cart)
+│   │   │   ├── page.tsx       # "/"
+│   │   │   └── checkout/      # "/checkout"
+│   │   ├── admin/             # لوحة التحكم (عربي/RTL دايمًا)
+│   │   │   ├── login/
+│   │   │   └── (dashboard)/   # المنتجات، الفئات، الطلبات، الإعدادات...
+│   │   └── api/                # كل الـ API routes (بديل الباك إند القديم)
+│   │       ├── products/, categories/, settings/, orders/, custom-orders/  (عامة)
+│   │       └── admin/          # محمية بـ withAdmin (login/logout عامة)
+│   ├── server/                 # كود السيرفر بس (يشتغل جوه الـ Route Handlers فقط)
+│   │   ├── prisma.ts           # Prisma Client singleton
+│   │   ├── r2.ts                # رفع/حذف الصور على Cloudflare R2
+│   │   ├── adminAuth.ts        # JWT + كوكي الأدمين + withAdmin() wrapper
+│   │   └── services/            # منطق البيانات (Product/Category/Order/...)
+│   ├── scripts/                 # seed.ts, generateAdminHash.ts (تشغيل بـ tsx)
+│   ├── components/              # مكونات الواجهة (متجر + أدمين)
+│   ├── context/                  # Lang / Cart / Toast / AdminAuth
+│   └── lib/                      # types + دوال fetch من جانب المتصفح
+```
+
+### ليه مفيش باك إند منفصل
+
+كانت الفكرة الأولى تشغيل باك إند Express جنب الفرونت إند، لكن ده معناه ديبلويين منفصلين على Vercel وكوكيز عبر دومينين مختلفين (تعقيد إضافي من غير داعي). دلوقتي كل منطق الـ API اتحوّل لـ **Next.js Route Handlers** — نفس الداتابيز، نفس الـ R2، بس شغالين جوه نفس تطبيق Next.js. النتيجة: ديبلوي واحد، دومين واحد، تيرمينال واحد للتشغيل المحلي.
 
 ### الـ Endpoints العامة (Public)
 
@@ -41,175 +96,60 @@ npm run dev
 | GET    | `/api/products`       | إرجاع كل المنتجات                                     |
 | GET    | `/api/categories`     | إرجاع كل التصنيفات                                    |
 | GET    | `/api/settings`       | بيانات الدفع (إنستاباي/فودافون كاش) لصفحة الـ Checkout |
-| POST   | `/api/orders`         | حفظ طلب شراء عادي (JSON)                              |
+| POST   | `/api/orders`         | حفظ طلب شراء عادي                                     |
 | POST   | `/api/custom-orders`  | حفظ طلب خاص + صورة مرفوعة (`multipart/form-data`)     |
 
-### الـ Endpoints الخاصة بالأدمين (Protected — محتاجة تسجيل دخول)
+### الـ Endpoints الخاصة بالأدمين (محتاجة تسجيل دخول)
 
 | Method | Path                              | الوظيفة                                    |
 | ------ | --------------------------------- | ------------------------------------------- |
-| POST   | `/api/admin/login`                | تسجيل الدخول (يرجّع JWT في httpOnly cookie) |
+| POST   | `/api/admin/login`                | تسجيل الدخول (كوكي httpOnly)                |
 | POST   | `/api/admin/logout`               | تسجيل الخروج                                |
-| GET    | `/api/admin/me`                   | بيانات الأدمين الحالي (للتحقق من الجلسة)   |
-| GET    | `/api/admin/stats`                | إحصائيات سريعة للوحة التحكم                |
-| GET/POST | `/api/admin/products`           | عرض/إضافة منتج (الإضافة `multipart/form-data` مع صورة اختيارية) |
+| GET    | `/api/admin/me`                   | بيانات الأدمين الحالي                       |
+| GET    | `/api/admin/stats`                | إحصائيات لوحة التحكم                        |
+| GET/POST | `/api/admin/products`           | عرض/إضافة منتج (صورة اختيارية)              |
 | PUT/DELETE | `/api/admin/products/:id`      | تعديل/حذف منتج                              |
 | GET/POST | `/api/admin/categories`         | عرض/إضافة فئة                               |
-| PUT/DELETE | `/api/admin/categories/:key`   | تعديل/حذف فئة (ممنوع حذف فئة مرتبطة بمنتجات، أو فئة "الكل") |
+| PUT/DELETE | `/api/admin/categories/:key`   | تعديل/حذف فئة (ممنوع حذف فئة مرتبطة بمنتجات أو فئة "الكل") |
 | GET    | `/api/admin/orders`               | كل طلبات الشراء                             |
-| PATCH  | `/api/admin/orders/:id`           | تحديث حالة الطلب (`pending`/`confirmed`/`shipped`) |
+| PATCH  | `/api/admin/orders/:id`           | تحديث حالة الطلب                            |
 | GET    | `/api/admin/custom-orders`        | كل الطلبات الخاصة                           |
 | PATCH  | `/api/admin/custom-orders/:id`    | تحديث الحالة و/أو الملاحظة الداخلية        |
 | GET/PUT | `/api/admin/settings`            | عرض/تعديل رقم إنستاباي وفودافون كاش        |
 
-الصور المرفوعة (طلبات خاصة + صور منتجات) بتترفع مباشرة على Cloudflare R2 وبترجع كـ رابط عام كامل (`https://pub-xxxxx.r2.dev/...`) — مفيش تخزين محلي خالص.
+---
 
-### حساب الأدمين
+## 3) صفحات الموقع
 
-بيانات تجريبية جاهزة في `backend/.env`:
+### المتجر (عام)
+- `/` — Hero، شريط القيم، المتجر (فلترة + منتجات)، قصتنا، طلب خاص، نشرة بريدية.
+- `/checkout` — ملخص السلة، بيانات التوصيل، طريقة الدفع (بيانات حية من الإعدادات).
 
-```
-البريد:      admin@ayasmanual.com
-كلمة المرور: Ayas@Admin123
-```
-
-⚠️ **غيّري كلمة المرور دي** قبل ما توري المشروع لأي حد أو ترفعيه أونلاين. لتوليد هاش جديد لكلمة مرور جديدة:
-
-```powershell
-cd backend
-npm run hash-password -- "كلمة-المرور-الجديدة"
-```
-
-انسخي الناتج والصقيه في `backend/.env` بدل `ADMIN_PASSWORD_HASH`.
-
-### هيكلة الباك إند
-
-- `src/services/StorageService.ts` — الواجهة (interface) العامة لأي مصدر بيانات (`getAll`, `getById`, `create`, `update`, `remove`). كل الـ routes بتتعامل مع الـ services من خلال الواجهة دي بس.
-- `prisma/schema.prisma` — تعريف الجداول (Product, Category, Order, CustomOrder, Settings) في Postgres.
-- `src/lib/prisma.ts` — نسخة واحدة مشتركة من `PrismaClient` (singleton) عشان منفتحش اتصالات كتير بالقاعدة.
-- `src/services/ProductService.ts` / `CategoryService.ts` / `OrderService.ts` / `CustomOrderService.ts` / `SettingsService.ts` — كل واحدة بتنفّذ نفس الواجهة باستخدام Prisma بدل ملفات JSON.
-- `src/middleware/requireAdmin.ts` — بيتحقق من JWT في الكوكي `admin_token` قبل أي مسار أدمين.
-- `src/lib/r2.ts` — رفع/حذف الصور على Cloudflare R2 (`uploadImageToR2`, `uploadBufferToR2`, `deleteImageFromR2`).
-- `src/middleware/upload.ts` — Multer بـ `memoryStorage` (الملف بيفضل في الذاكرة بس لحد ما يترفع على R2، من غير أي كتابة على القرص).
-
-### قاعدة البيانات (Postgres عبر Prisma)
-
-- كل البيانات (منتجات، فئات، طلبات، طلبات خاصة، إعدادات) في Postgres حقيقي (Neon)، مش ملفات JSON.
-- بعد أي تعديل في `prisma/schema.prisma`، شغّلي `npx prisma db push` عشان تحدّثي الجداول في القاعدة.
-- `npx prisma studio` بيفتح واجهة رسومية في المتصفح تقدري تتصفحي وتعدّلي بيها البيانات مباشرة — مفيدة جدًا للمراجعة السريعة.
-
-### تخزين الصور (Cloudflare R2)
-
-- كل صورة بترفعها (منتج أو طلب خاص) بتتبعت مباشرة لـ R2 وبترجع كرابط عام كامل بيتخزن في القاعدة (عمود `image` / `imagePath`).
-- لما تعدّلي صورة منتج أو تمسحيه، النسخة القديمة بتتمسح من R2 تلقائيًا (مفيش صور يتيمة بتتراكم).
-- الـ bucket لازم يكون مفعّل عليه **Public Access** (من تبويب Settings في R2) عشان الروابط تشتغل من غير أي مصادقة.
-- متغيرات البيئة المطلوبة: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` (شوفي `.env.example`).
-
-### إعادة تعبئة البيانات التجريبية
-
-`npm run seed` بيعمل مسح كامل لكل الجداول في القاعدة وإعادة تعبئتها بـ 6 فئات، 10 منتجات، 4 طلبات، و3 طلبات خاصة (باستخدام صور placeholder بيتم توليدها برمجيًا، مش ملفات حقيقية) — شغّليه وقت ما حابة ترجعي لبيانات ديمو نضيفة. ⚠️ ده بيمسح أي بيانات حقيقية موجودة في القاعدة، فاستخدميه بس على قاعدة تجريبية/تطوير.
+### لوحة الأدمين (عربي فقط، مفيش تبديل لغة)
+- `/admin/login`, `/admin` (نظرة عامة), `/admin/products`, `/admin/categories`, `/admin/orders`, `/admin/custom-orders`, `/admin/settings`.
 
 ---
 
-## 2) تشغيل الفرونت إند (Frontend)
+## 4) قاعدة البيانات والصور
 
-في تيرمينال تاني (مع سيبان الباك إند شغال):
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-هيشتغل الموقع على `http://localhost:3000`.
-
-### صفحات المتجر (عامة)
-
-- `/` — الصفحة الرئيسية: Hero، شريط القيم، المتجر (فلترة تصنيفات + منتجات من الـ API)، قصتنا، طلب خاص (رفع صورة)، نشرة بريدية.
-- `/checkout` — صفحة إتمام الطلب: ملخص السلة، بيانات التوصيل، اختيار طريقة الدفع (إنستاباي / فودافون كاش، الأرقام بتيجي مباشرة من إعدادات الأدمين) ثم إرسال الطلب لـ الباك إند.
-
-### لوحة تحكم الأدمين
-
-- `/admin/login` — تسجيل الدخول.
-- `/admin` — نظرة عامة (عدد الطلبات الجديدة، الطلبات الخاصة الجديدة، عدد المنتجات).
-- `/admin/products` — جدول المنتجات + فورم إضافة/تعديل (بما فيه رفع صورة حقيقية اختيارية) + تأكيد قبل الحذف.
-- `/admin/categories` — إضافة/تعديل/حذف الفئات.
-- `/admin/orders` — كل طلبات الشراء مع Dropdown لتغيير الحالة.
-- `/admin/custom-orders` — كل الطلبات الخاصة، الصورة المرفقة بحجم واضح، ملاحظة داخلية، Dropdown لتغيير الحالة.
-- `/admin/settings` — تعديل رقم إنستاباي وفودافون كاش (بتنعكس فورًا على صفحة الـ Checkout).
-
-لوحة الأدمين بالعربي بس دايمًا (مفيش تبديل لغة)، بغض النظر عن اللغة المختارة في المتجر.
-
-### إدارة الحالة
-
-- **اللغة**: `src/context/LangContext.tsx` (للمتجر فقط) — بيتحكم في `dir`/`lang` على مستوى `<html>` وبيغيّر النصوص عبر دالة `t(key)`. اختيار اللغة بيتحفظ في `localStorage`.
-- **السلة**: `src/context/CartContext.tsx` — عربة تسوق محلية، بتتحفظ في `localStorage`.
-- **التنبيهات (Toast)**: `src/context/ToastContext.tsx` — مشتركة بين المتجر ولوحة الأدمين.
-- **جلسة الأدمين**: `src/context/AdminAuthContext.tsx` — بتتحقق من `/api/admin/me` عند التحميل، وبتحوّل تلقائيًا لصفحة اللوجين لو مفيش جلسة صالحة.
-
-### هيكل الصفحات (App Router)
-
-استخدمنا route group `(site)` عشان نفصل شكل المتجر (Header/Footer/Cart) عن شكل لوحة الأدمين (Sidebar/Topbar) بدون ما يأثر على الروابط:
-
-```
-src/app/
-├── layout.tsx              # Root: fonts + Toast فقط
-├── (site)/
-│   ├── layout.tsx          # Header + Footer + Cart (Lang/Cart providers)
-│   ├── page.tsx            # الصفحة الرئيسية "/"
-│   └── checkout/page.tsx   # "/checkout"
-└── admin/
-    ├── layout.tsx          # يفرض عربي/RTL + AdminAuthProvider
-    ├── login/page.tsx      # "/admin/login"
-    └── (dashboard)/
-        ├── layout.tsx      # يتحقق من تسجيل الدخول، Sidebar + Topbar
-        ├── page.tsx        # "/admin"
-        ├── products/page.tsx
-        ├── categories/page.tsx
-        ├── orders/page.tsx
-        ├── custom-orders/page.tsx
-        └── settings/page.tsx
-```
-
-### ملحوظة عن اللوجو
-
-اللوجو (base64 JPEG) اللي كان متضمن جوه ملف الـ HTML الأصلي اتبدّل بشعار SVG بسيط بنفس روح التصميم (نفس الألوان والدوائر المتداخلة زي رسمة الـ Hero)، بدل نسخ نص base64 ضخم يدويًا جوه الكود. لو عندك ملف اللوجو الحقيقي، حطه في `frontend/public/logo.png` (أو `.svg`) واستبدل محتوى `frontend/src/components/Logo.tsx` بـ `<Image src="/logo.png" ... />`.
+- **Postgres عبر Prisma**: بعد أي تعديل في `prisma/schema.prisma` شغّلي `npx prisma db push`. `npx prisma studio` بيفتح واجهة رسومية لتصفح/تعديل البيانات مباشرة.
+- **الصور على R2**: كل صورة بترفعها بتتخزن على R2 وترجع كرابط عام كامل. لما تعدّلي/تمسحي صورة، النسخة القديمة بتتمسح من R2 تلقائيًا.
+- **`npm run seed`**: بيمسح كل الجداول ويعيد تعبئتها بـ 6 فئات، 10 منتجات، 4 طلبات، 3 طلبات خاصة. ⚠️ ده بيمسح أي بيانات حقيقية موجودة — استخدميه بس لما تحبي ترجعي لحالة ديمو نضيفة.
 
 ---
 
-## 3) اختبار سريع بعد التشغيل
+## 5) متغيرات البيئة
 
-**المتجر:**
-1. افتح `http://localhost:3000` — المفروض تشوف المنتجات محمّلة من الباك إند.
-2. جربي فلترة التصنيفات، فتح تفاصيل منتج، وإضافته للسلة.
-3. غيّري اللغة من الزرار في الهيدر (AR/EN) وشوفي إن الاتجاه بيتقلب RTL/LTR صح.
-4. افتحي "طلب خاص"، ارفعي صورة، واملي البيانات وابعتي.
-5. ضيفي منتجات للسلة وروحي `Checkout`، املي بيانات التوصيل وابعتي.
+نفس المتغيرات محليًا وعلى Vercel (مشروع واحد):
 
-**لوحة الأدمين:**
-1. افتحي `http://localhost:3000/admin` — المفروض تتحولي تلقائيًا لصفحة اللوجين.
-2. سجّلي دخول بالبيانات التجريبية (فوق).
-3. من `/admin` هتشوفي إحصائيات فيها أرقام حقيقية (لو شغّلتي `npm run seed`).
-4. من `/admin/products` جربي إضافة منتج جديد بصورة، وتعديله، وحذفه.
-5. من `/admin/orders` و`/admin/custom-orders` غيّري حالة أي طلب وشوفي التحديث فورًا.
-6. من `/admin/settings` غيّري رقم فودافون كاش، وارجعي لصفحة `/checkout` في المتجر وشوفي إن الرقم اتغيّر.
-
----
-
-## 4) متغيرات البيئة (Environment Variables)
-
-### `backend/.env`
 ```
-PORT=4000
-CORS_ORIGIN=http://localhost:3000
-
-DATABASE_URL=<connection string بتاع Postgres — Neon/Vercel Postgres/Supabase>
+DATABASE_URL=<connection string بتاع Postgres>
 
 ADMIN_EMAIL=admin@ayasmanual.com
-ADMIN_PASSWORD_HASH=<bcrypt hash>
+ADMIN_PASSWORD_HASH=<bcrypt hash — بعلامات $ متعملة escape كـ \$>
 JWT_SECRET=<سلسلة عشوائية طويلة>
 
-R2_ACCOUNT_ID=<account id بتاع Cloudflare>
+R2_ACCOUNT_ID=<Cloudflare account id>
 R2_ACCESS_KEY_ID=<من R2 API Token>
 R2_SECRET_ACCESS_KEY=<من R2 API Token>
 R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
@@ -217,23 +157,20 @@ R2_BUCKET_NAME=<اسم الـ bucket>
 R2_PUBLIC_URL=https://pub-xxxxx.r2.dev
 ```
 
-### `frontend/.env.example`
-```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
-```
+لما تنشري على Vercel: انسخي نفس المتغيرات دي في إعدادات المشروع (Environment Variables)، وولّدي `JWT_SECRET` و`ADMIN_PASSWORD_HASH` جداد (متستخدميش القيم التجريبية دي في بيئة حقيقية).
 
-لما تنتقل للاستضافة (hosting) لاحقًا:
-- غيّري `NEXT_PUBLIC_API_BASE_URL` على رابط الباك إند المنشور، و`CORS_ORIGIN` على رابط الفرونت إند المنشور.
-- غيّري `JWT_SECRET` و`ADMIN_PASSWORD_HASH` لقيم حقيقية جديدة (متستخدميش القيم التجريبية دي في أي بيئة حقيقية).
-- فعّلي `secure: true` على كوكي الأدمين (بيحصل تلقائيًا لما `NODE_ENV=production` مع https).
+---
+
+## 6) النشر على Vercel
+
+مشروع واحد بس، Root Directory = `frontend` (أو جذر الريبو لو الريبو نفسه فيه فولدر `frontend` بس). حطي كل المتغيرات فوق في إعدادات المشروع، واعملي Deploy. خلاص — الموقع كله (متجر + أدمين + API) هيشتغل من رابط واحد.
 
 ---
 
 ## اللي لسه ناقص (لو حبيتي نكمل فيه)
 
-- **النشر على Vercel** — الفرونت إند والباك إند مع بعض. الباك إند دلوقتي مالوش أي اعتماد على تخزين محلي (Postgres للبيانات، R2 للصور)، يعني جاهز للخطوة دي.
 - **Authentication لعميلات المتجر** — حاليًا مفيش تسجيل دخول للعميلة نفسها لمتابعة طلباتها (بس الأدمين بس).
 - **دفع إلكتروني حقيقي** — حاليًا الدفع بيتم يدويًا (تحويل بنكي/محفظة + رقم عملية يراجعه الأدمين)، ولو حبيتي لاحقًا تدمجي بوابة دفع فعلية (Paymob, Fawry, إلخ).
-- **صلاحيات متعددة** — حاليًا أدمين واحد بس؛ لو احتجتي أكتر من مستخدم بصلاحيات مختلفة محتاجين نظام مستخدمين حقيقي بدل حساب واحد في `.env`.
+- **صلاحيات متعددة** — حاليًا أدمين واحد بس في `.env`؛ لو احتجتي أكتر من مستخدم محتاجين نظام مستخدمين حقيقي.
 
 قولّي إمتى تحب تبدأ في أي من النقط دي وهنكمل خطوة بخطوة.

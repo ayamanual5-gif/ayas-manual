@@ -1,29 +1,19 @@
-import type { Category, OrderPayload, Product, Settings } from "./types";
-
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000";
+import type { Category, OrderPayload, Settings } from "./types";
 
 export function resolveImageUrl(path: string): string {
-  // R2-hosted images are already absolute URLs; only local/relative
-  // paths need the API origin prefixed.
-  if (/^https?:\/\//.test(path)) return path;
-  return `${API_BASE_URL}${path}`;
-}
-
-export async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch(`${API_BASE_URL}/api/products`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to load products");
-  return res.json();
+  // R2-hosted images are already absolute URLs; anything else (shouldn't
+  // normally happen) is returned as-is since there's no separate API origin anymore.
+  return path;
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  const res = await fetch(`${API_BASE_URL}/api/categories`, { cache: "no-store" });
+  const res = await fetch("/api/categories", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load categories");
   return res.json();
 }
 
 export async function submitOrder(payload: OrderPayload) {
-  const res = await fetch(`${API_BASE_URL}/api/orders`, {
+  const res = await fetch("/api/orders", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -36,13 +26,13 @@ export async function submitOrder(payload: OrderPayload) {
 }
 
 export async function fetchSettings(): Promise<Settings> {
-  const res = await fetch(`${API_BASE_URL}/api/settings`, { cache: "no-store" });
+  const res = await fetch("/api/settings", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load settings");
   return res.json();
 }
 
 export async function submitCustomOrder(formData: FormData) {
-  const res = await fetch(`${API_BASE_URL}/api/custom-orders`, {
+  const res = await fetch("/api/custom-orders", {
     method: "POST",
     body: formData,
   });
