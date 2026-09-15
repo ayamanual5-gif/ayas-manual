@@ -6,6 +6,16 @@ import { ADMIN_COOKIE_NAME, JWT_SECRET } from "../../middleware/requireAdmin";
 const router = Router();
 const isProd = process.env.NODE_ENV === "production";
 
+// Frontend and backend live on different *.vercel.app domains in production,
+// so the cookie must be sent cross-site: SameSite=None requires Secure (HTTPS),
+// which Vercel provides. Locally (http://localhost) we stay on Lax/insecure.
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+  secure: isProd,
+  path: "/",
+};
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body ?? {};
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -35,18 +45,15 @@ router.post("/login", async (req, res) => {
   const token = jwt.sign({ email: adminEmail }, JWT_SECRET, { expiresIn: "7d" });
 
   res.cookie(ADMIN_COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: isProd,
+    ...cookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    path: "/",
   });
 
   res.json({ email: adminEmail });
 });
 
 router.post("/logout", (_req, res) => {
-  res.clearCookie(ADMIN_COOKIE_NAME, { path: "/" });
+  res.clearCookie(ADMIN_COOKIE_NAME, cookieOptions);
   res.json({ ok: true });
 });
 
