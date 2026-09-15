@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { upload } from "../../middleware/upload";
+import { deleteImageFromR2, uploadImageToR2 } from "../../lib/r2";
 import { productService } from "../../services/ProductService";
-import { deleteUploadedFile } from "../../utils/fileCleanup";
 import type { Product, ProductTint } from "../../types";
 
 const router = Router();
@@ -50,7 +50,7 @@ router.post("/", upload.single("image"), async (req, res) => {
     name: { ar: nameAr.trim(), en: nameEn.trim() },
     tag: { ar: typeof tagAr === "string" ? tagAr.trim() : "", en: typeof tagEn === "string" ? tagEn.trim() : "" },
     desc: { ar: typeof descAr === "string" ? descAr.trim() : "", en: typeof descEn === "string" ? descEn.trim() : "" },
-    image: req.file ? `/uploads/${req.file.filename}` : null,
+    image: req.file ? await uploadImageToR2(req.file) : null,
   };
 
   const saved = await productService.create(product);
@@ -94,8 +94,8 @@ router.put("/:id", upload.single("image"), async (req, res) => {
   }
 
   if (req.file) {
-    patch.image = `/uploads/${req.file.filename}`;
-    await deleteUploadedFile(existing.image);
+    patch.image = await uploadImageToR2(req.file);
+    await deleteImageFromR2(existing.image);
   }
 
   const updated = await productService.update(id, patch);
@@ -111,7 +111,7 @@ router.delete("/:id", async (req, res) => {
     return;
   }
 
-  await deleteUploadedFile(existing.image);
+  await deleteImageFromR2(existing.image);
   await productService.remove(id);
   res.json({ ok: true });
 });

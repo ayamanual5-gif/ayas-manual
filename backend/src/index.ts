@@ -2,7 +2,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import path from "path";
 
 import { requireAdmin } from "./middleware/requireAdmin";
 
@@ -30,9 +29,6 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
-
-// Serve uploaded photos (custom-order references + product images) as static files
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });

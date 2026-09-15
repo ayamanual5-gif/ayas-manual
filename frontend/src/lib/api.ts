@@ -4,6 +4,9 @@ export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000";
 
 export function resolveImageUrl(path: string): string {
+  // R2-hosted images are already absolute URLs; only local/relative
+  // paths need the API origin prefixed.
+  if (/^https?:\/\//.test(path)) return path;
   return `${API_BASE_URL}${path}`;
 }
 

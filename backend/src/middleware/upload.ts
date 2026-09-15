@@ -1,24 +1,7 @@
-import fs from "fs";
 import multer from "multer";
-import path from "path";
 
-export const uploadsDir = path.join(__dirname, "..", "..", "uploads");
-
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${uniqueSuffix}${ext}`);
-  },
-});
-
+// Files are held in memory only long enough to stream them to R2 — nothing
+// is written to local disk (Vercel's serverless filesystem is ephemeral).
 function imageFileFilter(
   _req: Express.Request,
   file: Express.Multer.File,
@@ -32,7 +15,7 @@ function imageFileFilter(
 }
 
 export const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter: imageFileFilter,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });

@@ -1,8 +1,6 @@
-import fs from "fs/promises";
-import path from "path";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
-import { uploadsDir } from "../middleware/upload";
+import { uploadBufferToR2 } from "../lib/r2";
 import type { Category, CustomOrder, Order, Product } from "../types";
 import { createSolidPng } from "./pngPlaceholder";
 
@@ -13,6 +11,15 @@ function daysAgo(days: number, hours = 0): Date {
   return date;
 }
 
+function r2Url(key: string): string {
+  const base = process.env.R2_PUBLIC_URL;
+  if (!base) throw new Error("R2_PUBLIC_URL is not set — see backend/.env");
+  return `${base.replace(/\/$/, "")}/${key}`;
+}
+
+// Already-uploaded to R2 by a one-time migration script when the backend moved off local disk.
+const PRODUCT_1_IMAGE_KEY = "1789491799185-937ea06868a5af03.jpeg";
+
 const categories: Category[] = [
   { key: "all", ar: "الكل", en: "All" },
   { key: "bags", ar: "حقائب", en: "Bags" },
@@ -22,8 +29,8 @@ const categories: Category[] = [
   { key: "cardigans", ar: "كارديجان", en: "Cardigans" },
 ];
 
-// Product 1 keeps the real photo uploaded earlier from the admin panel
-// (the file already lives in backend/uploads/ — this just re-links it).
+// Product 1 keeps the real photo uploaded earlier from the admin panel,
+// migrated to R2 when the backend moved off local disk storage.
 const products: Omit<Product, "id">[] = [
   {
     category: "bags",
@@ -37,7 +44,7 @@ const products: Omit<Product, "id">[] = [
       ar: "شنطة يومية فسيحة بحزام جلد طبيعي، معمولة بخيط قطني متين يتحمل الاستخدام اليومي.",
       en: "A spacious everyday tote with a genuine leather strap, woven from durable cotton cord that holds up to daily use.",
     },
-    image: "/uploads/1789421909550-424682317.jpeg",
+    image: r2Url(PRODUCT_1_IMAGE_KEY),
   },
   {
     category: "bags",
@@ -220,12 +227,8 @@ async function buildCustomOrders(): Promise<Omit<CustomOrder, "id">[]> {
   const roseImage = createSolidPng(480, 360, [190, 110, 119]);
   const oliveImage = createSolidPng(480, 360, [147, 113, 47]);
 
-  const roseFilename = "seed-custom-bag-reference.png";
-  const oliveFilename = "seed-custom-cardigan-reference.png";
-
-  await fs.mkdir(uploadsDir, { recursive: true });
-  await fs.writeFile(path.join(uploadsDir, roseFilename), roseImage);
-  await fs.writeFile(path.join(uploadsDir, oliveFilename), oliveImage);
+  const roseUrl = await uploadBufferToR2(roseImage, ".png", "image/png");
+  const oliveUrl = await uploadBufferToR2(oliveImage, ".png", "image/png");
 
   return [
     {
@@ -233,7 +236,7 @@ async function buildCustomOrders(): Promise<Omit<CustomOrder, "id">[]> {
       phone: "01011122233",
       category: "bags",
       description: "عايزة شنطة كروشيه بألوان الباستيل، بيج وروز، بمقاس متوسط ويكون فيها سوستة من جوه.",
-      imagePath: `/uploads/${roseFilename}`,
+      imagePath: roseUrl,
       status: "pending",
       internalNote: "",
       createdAt: daysAgo(2).toISOString(),
@@ -243,7 +246,7 @@ async function buildCustomOrders(): Promise<Omit<CustomOrder, "id">[]> {
       phone: "01155566677",
       category: "cardigans",
       description: "عايزة كارديجان بلون الزيتي بمقاس Large وأكمام طويلة، شبه الصورة المرفقة بالظبط.",
-      imagePath: `/uploads/${oliveFilename}`,
+      imagePath: oliveUrl,
       status: "confirmed",
       internalNote: "اتفقنا على السعر 750 جنيه، هتحول تحويل إنستاباي خلال يومين.",
       createdAt: daysAgo(5).toISOString(),

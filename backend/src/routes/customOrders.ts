@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { upload } from "../middleware/upload";
+import { uploadImageToR2 } from "../lib/r2";
 import { customOrderService } from "../services/CustomOrderService";
 import type { CustomOrder } from "../types";
 
@@ -21,7 +22,7 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 
   try {
-    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+    const imagePath = req.file ? await uploadImageToR2(req.file) : null;
 
     const customOrder: CustomOrder = {
       id: Date.now(),
