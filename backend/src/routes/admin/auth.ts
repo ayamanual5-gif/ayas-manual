@@ -6,12 +6,11 @@ import { ADMIN_COOKIE_NAME, JWT_SECRET } from "../../middleware/requireAdmin";
 const router = Router();
 const isProd = process.env.NODE_ENV === "production";
 
-// Frontend and backend live on different *.vercel.app domains in production,
-// so the cookie must be sent cross-site: SameSite=None requires Secure (HTTPS),
-// which Vercel provides. Locally (http://localhost) we stay on Lax/insecure.
+// The frontend proxies /api/* through its own domain (see frontend/next.config.ts),
+// so the browser only ever talks to one origin — a plain same-site Lax cookie is enough.
 const cookieOptions = {
   httpOnly: true,
-  sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+  sameSite: "lax" as const,
   secure: isProd,
   path: "/",
 };
