@@ -1,0 +1,287 @@
+@import "tailwindcss";
+
+@theme {
+  --color-teal: #005055;
+  --color-teal-700: #023d41;
+  --color-teal-900: #012c2f;
+  --color-beige: #f5ebd7;
+  --color-beige-100: #fbf3e2;
+  --color-beige-200: #efe0be;
+  --color-rose: #be6e77;
+  --color-rose-600: #a65a64;
+  --color-olive: #93712f;
+  --color-olive-600: #7a5d26;
+  --color-ink: #2b2319;
+  --color-ink-soft: #5c503f;
+}
+
+:root {
+  --teal: #005055;
+  --teal-700: #023d41;
+  --teal-900: #012c2f;
+  --beige: #f5ebd7;
+  --beige-100: #fbf3e2;
+  --beige-200: #efe0be;
+  --rose: #be6e77;
+  --rose-600: #a65a64;
+  --olive: #93712f;
+  --olive-600: #7a5d26;
+  --ink: #2b2319;
+  --ink-soft: #5c503f;
+  --ring: rgba(0, 80, 85, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  background: var(--beige);
+  color: var(--ink);
+}
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+body.lang-ar {
+  font-family: var(--font-cairo), "Segoe UI", sans-serif;
+}
+body.lang-en {
+  font-family: var(--font-jost), "Segoe UI", sans-serif;
+}
+.font-display.lang-ar,
+.lang-ar .font-display {
+  font-family: var(--font-aref-ruqaa), var(--font-cairo), serif;
+}
+.font-display.lang-en,
+.lang-en .font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+h1,
+h2,
+h3,
+.font-display {
+  text-wrap: balance;
+}
+::selection {
+  background: var(--rose);
+  color: #fff;
+}
+a {
+  color: inherit;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.eyebrow {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.lang-ar .eyebrow {
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+/* scalloped crochet-edge divider */
+.scallop {
+  height: 18px;
+  width: 100%;
+  background-repeat: repeat-x;
+  background-size: 22px 22px;
+}
+.scallop-down {
+  background-image: radial-gradient(circle at 11px 0px, transparent 10.5px, var(--edge, #005055) 11px);
+}
+.scallop-up {
+  background-image: radial-gradient(circle at 11px 18px, transparent 10.5px, var(--edge, #005055) 11px);
+}
+
+.stitch-rule {
+  height: 10px;
+  background-image: radial-gradient(circle at 5px 5px, var(--dot, #93712f) 1.6px, transparent 1.8px);
+  background-size: 14px 10px;
+  opacity: 0.55;
+}
+
+.card {
+  background: var(--beige-100);
+  border: 1px solid var(--beige-200);
+  border-radius: 22px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-primary {
+  background: var(--teal);
+  color: var(--beige-100);
+  box-shadow: 0 8px 20px -8px rgba(0, 80, 85, 0.55);
+}
+.btn-primary:hover {
+  background: var(--teal-700);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--teal);
+  border: 1.5px solid var(--teal);
+}
+.btn-outline:hover {
+  background: var(--teal);
+  color: var(--beige-100);
+}
+.btn-rose {
+  background: var(--rose);
+  color: #fff;
+}
+.btn-rose:hover {
+  background: var(--rose-600);
+}
+
+.chip {
+  border: 1px solid var(--beige-200);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--beige-100);
+}
+
+.tab-btn {
+  border-radius: 999px;
+  padding: 0.55rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1.5px solid transparent;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.tab-btn:hover {
+  border-color: var(--beige-200);
+}
+.tab-btn.active {
+  background: var(--teal);
+  color: var(--beige-100);
+  box-shadow: 0 6px 16px -8px rgba(0, 80, 85, 0.6);
+}
+
+.icon-tile {
+  aspect-ratio: 1;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-tile svg {
+  width: 52%;
+  height: 52%;
+}
+
+.drawer {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.backdrop {
+  transition: opacity 0.3s ease;
+}
+
+.field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  background: var(--beige-100);
+  border: 1.5px solid var(--beige-200);
+  border-radius: 14px;
+  padding: 0.7rem 0.9rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--teal);
+}
+
+.dropzone {
+  border: 2px dashed var(--olive);
+  border-radius: 20px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.dropzone.drag {
+  background: rgba(190, 110, 119, 0.12);
+  border-color: var(--rose);
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.35;
+}
+
+.toast {
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--beige-200);
+  border-radius: 99px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.hero-orbit {
+  animation: floaty 7s ease-in-out infinite;
+}
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

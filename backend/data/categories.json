@@ -1,0 +1,38 @@
+[
+  {
+    "id": "all",
+    "key": "all",
+    "ar": "الكل",
+    "en": "All"
+  },
+  {
+    "id": "bags",
+    "key": "bags",
+    "ar": "حقائب",
+    "en": "Bags"
+  },
+  {
+    "id": "scarves",
+    "key": "scarves",
+    "ar": "اسكارف",
+    "en": "Scarves"
+  },
+  {
+    "id": "accessories",
+    "key": "accessories",
+    "ar": "اكسسوارات",
+    "en": "Accessories"
+  },
+  {
+    "id": "decor",
+    "key": "decor",
+    "ar": "ديكور",
+    "en": "Decor"
+  },
+  {
+    "id": "cardigans",
+    "key": "cardigans",
+    "ar": "كارديجان",
+    "en": "Cardigans"
+  }
+]
