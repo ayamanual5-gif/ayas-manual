@@ -1,38 +1,34 @@
-import fs from "fs/promises";
-import path from "path";
+import { prisma } from "../lib/prisma";
 
 export interface Settings {
   instapayHandle: string;
   vodafoneCashNumber: string;
 }
 
-const filePath = path.join(__dirname, "..", "..", "data", "settings.json");
+const SETTINGS_ID = 1;
 
 const defaults: Settings = {
   instapayHandle: "ayasmanual@instapay",
   vodafoneCashNumber: "010 0123 4567",
 };
 
-async function ensureFile(): Promise<void> {
-  try {
-    await fs.access(filePath);
-  } catch {
-    await fs.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.writeFile(filePath, JSON.stringify(defaults, null, 2), "utf-8");
-  }
-}
-
 async function get(): Promise<Settings> {
-  await ensureFile();
-  const raw = await fs.readFile(filePath, "utf-8");
-  return { ...defaults, ...(raw.trim() ? JSON.parse(raw) : {}) };
+  const row = await prisma.settings.findUnique({ where: { id: SETTINGS_ID } });
+  if (row) return { instapayHandle: row.instapayHandle, vodafoneCashNumber: row.vodafoneCashNumber };
+
+  const created = await prisma.settings.create({ data: { id: SETTINGS_ID, ...defaults } });
+  return { instapayHandle: created.instapayHandle, vodafoneCashNumber: created.vodafoneCashNumber };
 }
 
 async function update(patch: Partial<Settings>): Promise<Settings> {
   const current = await get();
   const next = { ...current, ...patch };
-  await fs.writeFile(filePath, JSON.stringify(next, null, 2), "utf-8");
-  return next;
+  const row = await prisma.settings.upsert({
+    where: { id: SETTINGS_ID },
+    update: next,
+    create: { id: SETTINGS_ID, ...next },
+  });
+  return { instapayHandle: row.instapayHandle, vodafoneCashNumber: row.vodafoneCashNumber };
 }
 
 export const settingsService = { get, update };

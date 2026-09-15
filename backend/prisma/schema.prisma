@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id       Int      @id @default(autoincrement())
+  category String
+  icon     String
+  tint     String
+  price    Int
+  isNew    Boolean  @default(false)
+  // { ar: string, en: string } — kept as JSON to mirror the app's LocalizedText shape.
+  name     Json
+  tag      Json
+  desc     Json
+  image    String?
+}
+
+model Category {
+  key String @id
+  ar  String
+  en  String
+}
+
+model Order {
+  id               Int      @id @default(autoincrement())
+  customerName     String
+  phone            String
+  address          String
+  city             String
+  paymentMethod    String
+  paymentReference String?
+  // OrderItem[] — { productId, name, price, qty }
+  items            Json
+  subtotal         Int
+  notes            String?
+  status           String
+  createdAt        DateTime @default(now())
+}
+
+model CustomOrder {
+  id           Int      @id @default(autoincrement())
+  name         String
+  phone        String
+  category     String
+  description  String
+  imagePath    String?
+  status       String
+  internalNote String?  @default("")
+  createdAt    DateTime @default(now())
+}
+
+model Settings {
+  id                 Int    @id @default(1)
+  instapayHandle     String
+  vodafoneCashNumber String
+}

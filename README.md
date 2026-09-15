@@ -4,17 +4,18 @@
 
 ```
 bakar/
-├── backend/    # Express + TypeScript API، بيانات مخزنة في ملفات JSON محلية
+├── backend/    # Express + TypeScript API، بيانات مخزنة في Postgres (Neon) عبر Prisma
 └── frontend/   # Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4
 ```
 
-لا يوجد قاعدة بيانات حقيقية أو نشر (deployment) في هذه المرحلة — فقط تشغيل محلي، مع هيكلة الباك إند بحيث يسهل التبديل لقاعدة بيانات حقيقية لاحقاً بدون تعديل الـ routes.
+الباك إند شغال دلوقتي على قاعدة بيانات Postgres حقيقية (Neon) بدل ملفات JSON. الصور المرفوعة (منتجات + طلبات خاصة) لسه على القرص المحلي (`backend/uploads/`) لحد ما نربطها بـ Cloudflare R2 كخطوة جاية قبل النشر على Vercel.
 
 ---
 
 ## المتطلبات
 
 - **Node.js 18.18 أو أحدث** (مطلوب لـ Next.js 16 و React 19) — تأكد إنه متثبت ومتاح في الـ PATH (`node -v`, `npm -v`).
+- **قاعدة بيانات Postgres** — المشروع مربوط بـ [Neon](https://neon.tech) حاليًا (خطة مجانية). أي مزود Postgres تاني (Vercel Postgres، Supabase، إلخ) هيشتغل نفس الشيء، بس تحطي رابط الاتصال بتاعه في `DATABASE_URL`.
 
 ---
 
@@ -23,7 +24,8 @@ bakar/
 ```powershell
 cd backend
 npm install
-npm run seed     # يملأ orders.json و custom-orders.json ببيانات تجريبية واقعية
+npx prisma db push   # يجهّز الجداول في قاعدة البيانات (مرة واحدة، أو بعد أي تعديل في schema.prisma)
+npm run seed          # يملأ القاعدة بمنتجات/فئات/طلبات تجريبية واقعية
 npm run dev
 ```
 
@@ -80,25 +82,24 @@ npm run hash-password -- "كلمة-المرور-الجديدة"
 
 انسخي الناتج والصقيه في `backend/.env` بدل `ADMIN_PASSWORD_HASH`.
 
-### هيكلة الباك إند (ليه سهل تبديل قاعدة البيانات لاحقاً)
+### هيكلة الباك إند
 
-- `src/services/StorageService.ts` — الواجهة (interface) العامة لأي مصدر بيانات (`getAll`, `getById`, `create`, `update`, `remove`).
-- `src/services/JSONStorageService.ts` — التنفيذ الحالي: بيقرأ/يكتب في ملفات JSON تحت `backend/data/`.
-- `src/services/ProductService.ts` / `CategoryService.ts` / `OrderService.ts` / `CustomOrderService.ts` — كل واحدة بتستخدم `JSONStorageService` لملف مختلف.
-- `src/services/SettingsService.ts` — كائن إعدادات واحد (مش array) في `data/settings.json`.
-- لما تحب تنتقل لقاعدة بيانات حقيقية (مثلاً PostgreSQL + Prisma)، هتعمل كلاس جديد زي `PrismaStorageService` يطبّق نفس `StorageService` interface، وتستبدله في ملفات الـ `*Service.ts` بس — من غير أي تعديل في الـ routes أو الـ controllers.
+- `src/services/StorageService.ts` — الواجهة (interface) العامة لأي مصدر بيانات (`getAll`, `getById`, `create`, `update`, `remove`). كل الـ routes بتتعامل مع الـ services من خلال الواجهة دي بس.
+- `prisma/schema.prisma` — تعريف الجداول (Product, Category, Order, CustomOrder, Settings) في Postgres.
+- `src/lib/prisma.ts` — نسخة واحدة مشتركة من `PrismaClient` (singleton) عشان منفتحش اتصالات كتير بالقاعدة.
+- `src/services/ProductService.ts` / `CategoryService.ts` / `OrderService.ts` / `CustomOrderService.ts` / `SettingsService.ts` — كل واحدة بتنفّذ نفس الواجهة باستخدام Prisma بدل ملفات JSON.
 - `src/middleware/requireAdmin.ts` — بيتحقق من JWT في الكوكي `admin_token` قبل أي مسار أدمين.
 
-### بيانات JSON
+### قاعدة البيانات (Postgres عبر Prisma)
 
-- `data/products.json` — نفس الـ 10 منتجات من التصميم الأصلي (bilingual: `ar`/`en`)، وكل منتج ممكن يكون له `image` حقيقية (لو اتضافت من الأدمين) أو من غيرها بيظهر شكل أيقوني بلون مميز.
-- `data/categories.json` — التصنيفات (الكل، حقائب، اسكارف، اكسسوارات، ديكور، كارديجان) — فئة "الكل" أساسية ومحمية من التعديل/الحذف.
-- `data/orders.json` / `data/custom-orders.json` — بيتملوا تلقائيًا من المتجر، ومبدئيًا معبيين ببيانات تجريبية عبر `npm run seed`.
-- `data/settings.json` — رقم إنستاباي وفودافون كاش (بتتولد تلقائيًا بقيم افتراضية أول مرة).
+- كل البيانات (منتجات، فئات، طلبات، طلبات خاصة، إعدادات) دلوقتي في Postgres حقيقي (Neon)، مش ملفات JSON.
+- بعد أي تعديل في `prisma/schema.prisma`، شغّلي `npx prisma db push` عشان تحدّثي الجداول في القاعدة.
+- `npx prisma studio` بيفتح واجهة رسومية في المتصفح تقدري تتصفحي وتعدّلي بيها البيانات مباشرة — مفيدة جدًا للمراجعة السريعة.
+- الصور (منتجات + طلبات خاصة) لسه بتتخزن محليًا في `backend/uploads/` وبتتقرأ عبر `http://localhost:4000/uploads/<filename>` — الخطوة الجاية هي نقلها لـ Cloudflare R2 عشان تشتغل صح بعد النشر على Vercel (السيرفرات هناك مالهاش تخزين ثابت).
 
 ### إعادة تعبئة البيانات التجريبية
 
-`npm run seed` بيعمل overwrite لـ `orders.json` و`custom-orders.json` بـ 4 طلبات و3 طلبات خاصة (باستخدام صور placeholder بيتم توليدها برمجيًا، مش ملفات حقيقية) — شغّليه وقت ما حابة ترجعي لبيانات ديمو نضيفة.
+`npm run seed` بيعمل مسح كامل لكل الجداول في القاعدة وإعادة تعبئتها بـ 6 فئات، 10 منتجات، 4 طلبات، و3 طلبات خاصة (باستخدام صور placeholder بيتم توليدها برمجيًا، مش ملفات حقيقية) — شغّليه وقت ما حابة ترجعي لبيانات ديمو نضيفة. ⚠️ ده بيمسح أي بيانات حقيقية موجودة في القاعدة، فاستخدميه بس على قاعدة تجريبية/تطوير.
 
 ---
 
@@ -194,6 +195,8 @@ src/app/
 PORT=4000
 CORS_ORIGIN=http://localhost:3000
 
+DATABASE_URL=<connection string بتاع Postgres — Neon/Vercel Postgres/Supabase>
+
 ADMIN_EMAIL=admin@ayasmanual.com
 ADMIN_PASSWORD_HASH=<bcrypt hash>
 JWT_SECRET=<سلسلة عشوائية طويلة>
@@ -213,9 +216,9 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
 
 ## اللي لسه ناقص (لو حبيتي نكمل فيه)
 
+- **تخزين الصور على Cloudflare R2** — الخطوة الجاية، لازم تتعمل قبل النشر على Vercel (تخزين القرص المحلي مش هيشتغل هناك).
+- **النشر على Vercel** — الفرونت إند والباك إند مع بعض، بعد ما R2 يبقى جاهز.
 - **Authentication لعميلات المتجر** — حاليًا مفيش تسجيل دخول للعميلة نفسها لمتابعة طلباتها (بس الأدمين بس).
-- **قاعدة بيانات حقيقية** — الانتقال من JSON files لـ PostgreSQL/MySQL (مع Prisma مثلاً)، الهيكلة الحالية مُجهزة لده بالفعل.
-- **نشر (Deployment)** — رفع الباك إند (مثلاً على Render/Railway) والفرونت إند (مثلاً على Vercel)، وربط دومين حقيقي.
 - **دفع إلكتروني حقيقي** — حاليًا الدفع بيتم يدويًا (تحويل بنكي/محفظة + رقم عملية يراجعه الأدمين)، ولو حبيتي لاحقًا تدمجي بوابة دفع فعلية (Paymob, Fawry, إلخ).
 - **صلاحيات متعددة** — حاليًا أدمين واحد بس؛ لو احتجتي أكتر من مستخدم بصلاحيات مختلفة محتاجين نظام مستخدمين حقيقي بدل حساب واحد في `.env`.
 

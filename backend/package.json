@@ -2,16 +2,20 @@
   "name": "ayas-manual-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Local Express + TypeScript backend for Aya's Manual, backed by JSON files (swap-ready for a real database later).",
+  "description": "Express + TypeScript backend for Aya's Manual, backed by Postgres via Prisma.",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "postinstall": "prisma generate",
     "seed": "tsx src/scripts/seed.ts",
-    "hash-password": "tsx src/scripts/generateAdminHash.ts"
+    "hash-password": "tsx src/scripts/generateAdminHash.ts",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@prisma/client": "^6.3.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -28,6 +32,7 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/multer": "^2.0.0",
     "@types/node": "^20.14.0",
+    "prisma": "^6.3.1",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }
