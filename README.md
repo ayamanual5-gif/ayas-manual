@@ -8,7 +8,7 @@ bakar/
 └── frontend/   # Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4
 ```
 
-الباك إند شغال دلوقتي على قاعدة بيانات Postgres حقيقية (Neon) بدل ملفات JSON. الصور المرفوعة (منتجات + طلبات خاصة) لسه على القرص المحلي (`backend/uploads/`) لحد ما نربطها بـ Cloudflare R2 كخطوة جاية قبل النشر على Vercel.
+الباك إند شغال على قاعدة بيانات Postgres حقيقية (Neon) بدل ملفات JSON، والصور المرفوعة (منتجات + طلبات خاصة) بتتخزن على Cloudflare R2 بدل القرص المحلي — يعني جاهز للنشر على Vercel (اللي سيرفراته مالهاش تخزين ثابت).
 
 ---
 
@@ -62,7 +62,7 @@ npm run dev
 | PATCH  | `/api/admin/custom-orders/:id`    | تحديث الحالة و/أو الملاحظة الداخلية        |
 | GET/PUT | `/api/admin/settings`            | عرض/تعديل رقم إنستاباي وفودافون كاش        |
 
-الصور المرفوعة (طلبات خاصة + صور منتجات) بتتخزن في `backend/uploads/` وبتتقرأ عبر `http://localhost:4000/uploads/<filename>`.
+الصور المرفوعة (طلبات خاصة + صور منتجات) بتترفع مباشرة على Cloudflare R2 وبترجع كـ رابط عام كامل (`https://pub-xxxxx.r2.dev/...`) — مفيش تخزين محلي خالص.
 
 ### حساب الأدمين
 
@@ -89,13 +89,21 @@ npm run hash-password -- "كلمة-المرور-الجديدة"
 - `src/lib/prisma.ts` — نسخة واحدة مشتركة من `PrismaClient` (singleton) عشان منفتحش اتصالات كتير بالقاعدة.
 - `src/services/ProductService.ts` / `CategoryService.ts` / `OrderService.ts` / `CustomOrderService.ts` / `SettingsService.ts` — كل واحدة بتنفّذ نفس الواجهة باستخدام Prisma بدل ملفات JSON.
 - `src/middleware/requireAdmin.ts` — بيتحقق من JWT في الكوكي `admin_token` قبل أي مسار أدمين.
+- `src/lib/r2.ts` — رفع/حذف الصور على Cloudflare R2 (`uploadImageToR2`, `uploadBufferToR2`, `deleteImageFromR2`).
+- `src/middleware/upload.ts` — Multer بـ `memoryStorage` (الملف بيفضل في الذاكرة بس لحد ما يترفع على R2، من غير أي كتابة على القرص).
 
 ### قاعدة البيانات (Postgres عبر Prisma)
 
-- كل البيانات (منتجات، فئات، طلبات، طلبات خاصة، إعدادات) دلوقتي في Postgres حقيقي (Neon)، مش ملفات JSON.
+- كل البيانات (منتجات، فئات، طلبات، طلبات خاصة، إعدادات) في Postgres حقيقي (Neon)، مش ملفات JSON.
 - بعد أي تعديل في `prisma/schema.prisma`، شغّلي `npx prisma db push` عشان تحدّثي الجداول في القاعدة.
 - `npx prisma studio` بيفتح واجهة رسومية في المتصفح تقدري تتصفحي وتعدّلي بيها البيانات مباشرة — مفيدة جدًا للمراجعة السريعة.
-- الصور (منتجات + طلبات خاصة) لسه بتتخزن محليًا في `backend/uploads/` وبتتقرأ عبر `http://localhost:4000/uploads/<filename>` — الخطوة الجاية هي نقلها لـ Cloudflare R2 عشان تشتغل صح بعد النشر على Vercel (السيرفرات هناك مالهاش تخزين ثابت).
+
+### تخزين الصور (Cloudflare R2)
+
+- كل صورة بترفعها (منتج أو طلب خاص) بتتبعت مباشرة لـ R2 وبترجع كرابط عام كامل بيتخزن في القاعدة (عمود `image` / `imagePath`).
+- لما تعدّلي صورة منتج أو تمسحيه، النسخة القديمة بتتمسح من R2 تلقائيًا (مفيش صور يتيمة بتتراكم).
+- الـ bucket لازم يكون مفعّل عليه **Public Access** (من تبويب Settings في R2) عشان الروابط تشتغل من غير أي مصادقة.
+- متغيرات البيئة المطلوبة: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` (شوفي `.env.example`).
 
 ### إعادة تعبئة البيانات التجريبية
 
@@ -200,6 +208,13 @@ DATABASE_URL=<connection string بتاع Postgres — Neon/Vercel Postgres/Supab
 ADMIN_EMAIL=admin@ayasmanual.com
 ADMIN_PASSWORD_HASH=<bcrypt hash>
 JWT_SECRET=<سلسلة عشوائية طويلة>
+
+R2_ACCOUNT_ID=<account id بتاع Cloudflare>
+R2_ACCESS_KEY_ID=<من R2 API Token>
+R2_SECRET_ACCESS_KEY=<من R2 API Token>
+R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
+R2_BUCKET_NAME=<اسم الـ bucket>
+R2_PUBLIC_URL=https://pub-xxxxx.r2.dev
 ```
 
 ### `frontend/.env.example`
@@ -216,8 +231,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
 
 ## اللي لسه ناقص (لو حبيتي نكمل فيه)
 
-- **تخزين الصور على Cloudflare R2** — الخطوة الجاية، لازم تتعمل قبل النشر على Vercel (تخزين القرص المحلي مش هيشتغل هناك).
-- **النشر على Vercel** — الفرونت إند والباك إند مع بعض، بعد ما R2 يبقى جاهز.
+- **النشر على Vercel** — الفرونت إند والباك إند مع بعض. الباك إند دلوقتي مالوش أي اعتماد على تخزين محلي (Postgres للبيانات، R2 للصور)، يعني جاهز للخطوة دي.
 - **Authentication لعميلات المتجر** — حاليًا مفيش تسجيل دخول للعميلة نفسها لمتابعة طلباتها (بس الأدمين بس).
 - **دفع إلكتروني حقيقي** — حاليًا الدفع بيتم يدويًا (تحويل بنكي/محفظة + رقم عملية يراجعه الأدمين)، ولو حبيتي لاحقًا تدمجي بوابة دفع فعلية (Paymob, Fawry, إلخ).
 - **صلاحيات متعددة** — حاليًا أدمين واحد بس؛ لو احتجتي أكتر من مستخدم بصلاحيات مختلفة محتاجين نظام مستخدمين حقيقي بدل حساب واحد في `.env`.
