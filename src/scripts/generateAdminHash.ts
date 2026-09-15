@@ -8,6 +8,7 @@ if (!password) {
 }
 
 const hash = bcrypt.hashSync(password, 10);
-console.log("\nAdd this to frontend/.env as ADMIN_PASSWORD_HASH:\n");
-console.log(hash);
+const escaped = hash.replace(/\$/g, "\\$");
+console.log("\nAdd this to .env as ADMIN_PASSWORD_HASH (already escaped for Next.js):\n");
+console.log(escaped);
 console.log("");
