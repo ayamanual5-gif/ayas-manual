@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useLang } from "@/context/LangContext";
 import ProductCard from "./ProductCard";
+import Reveal from "./motion/Reveal";
+import { StaggerContainer } from "./motion/Stagger";
 import type { Product } from "@/lib/types";
 
 export default function HomeFeatured({ products }: { products: Product[] }) {
@@ -13,7 +15,7 @@ export default function HomeFeatured({ products }: { products: Product[] }) {
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <Reveal className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-xl">
           <span className="eyebrow" style={{ color: "var(--rose)" }}>
             {t("home.shopTeaserEyebrow")}
@@ -25,13 +27,13 @@ export default function HomeFeatured({ products }: { products: Product[] }) {
         <Link href="/shop" className="btn btn-outline px-6 py-3 whitespace-nowrap">
           {t("home.shopTeaserCta")}
         </Link>
-      </div>
+      </Reveal>
 
-      <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <StaggerContainer className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {featured.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
-      </div>
+      </StaggerContainer>
     </section>
   );
 }

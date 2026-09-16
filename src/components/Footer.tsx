@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { cssVars } from "@/lib/cssVars";
 import Logo from "./Logo";
+import Reveal from "./motion/Reveal";
 
 export default function Footer() {
   const { t } = useLang();
@@ -11,7 +13,7 @@ export default function Footer() {
   return (
     <footer className="text-beige-100" style={{ background: "var(--teal-900)" }}>
       <div className="scallop scallop-down" style={cssVars({ "--edge": "var(--teal-900)" })} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
+      <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
         <div>
           <div className="flex items-center gap-2.5">
             <Logo size={40} />
@@ -40,9 +42,11 @@ export default function Footer() {
           <p className="font-semibold opacity-90">{t("footer.followTitle")}</p>
           <div className="mt-3 flex gap-3">
             {["Instagram", "WhatsApp", "Pinterest"].map((label) => (
-              <a
+              <motion.a
                 key={label}
                 href="#"
+                whileHover={{ y: -3, scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
                 className="w-9 h-9 rounded-full flex items-center justify-center"
                 style={{ background: "rgba(245,235,215,.12)" }}
                 aria-label={label}
@@ -50,11 +54,11 @@ export default function Footer() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <circle cx="12" cy="12" r="9" />
                 </svg>
-              </a>
+              </motion.a>
             ))}
           </div>
         </div>
-      </div>
+      </Reveal>
       <div
         className="border-t py-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center text-xs opacity-70"
         style={{ borderColor: "rgba(245,235,215,.15)" }}

@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { useLang } from "@/context/LangContext";
 import CategoryTabs from "./CategoryTabs";
 import ProductCard from "./ProductCard";
+import Reveal from "./motion/Reveal";
+import { StaggerContainer } from "./motion/Stagger";
 import type { Category, Product } from "@/lib/types";
 
 export default function ShopSection({
@@ -28,7 +30,7 @@ export default function ShopSection({
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
-      <div className="max-w-xl">
+      <Reveal className="max-w-xl">
         <span className="eyebrow" style={{ color: "var(--rose)" }}>
           {t("shop.eyebrow")}
         </span>
@@ -38,7 +40,7 @@ export default function ShopSection({
         <p className="mt-3" style={{ color: "var(--ink-soft)" }}>
           {t("shop.sub")}
         </p>
-      </div>
+      </Reveal>
 
       {loadError ? (
         <p className="mt-10 card p-6 text-center" style={{ color: "var(--rose-600)" }}>
@@ -53,11 +55,11 @@ export default function ShopSection({
               {t("shop.empty")}
             </p>
           ) : (
-            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <StaggerContainer key={activeCategory} className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {filtered.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
-            </div>
+            </StaggerContainer>
           )}
         </>
       )}

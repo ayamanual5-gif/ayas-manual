@@ -2,9 +2,12 @@
 
 import { useRef, useState } from "react";
 import type { DragEvent, FormEvent, MouseEvent } from "react";
+import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { submitCustomOrder } from "@/lib/api";
 import type { Category } from "@/lib/types";
+import Reveal from "./motion/Reveal";
+import { EASE } from "./motion/variants";
 
 export default function CustomOrderSection({ categories }: { categories: Category[] }) {
   const { lang, t } = useLang();
@@ -75,7 +78,7 @@ export default function CustomOrderSection({ categories }: { categories: Categor
   return (
     <section className="py-16 sm:py-20" style={{ background: "var(--beige-100)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="max-w-xl mb-10">
+        <Reveal className="max-w-xl mb-10">
           <span className="eyebrow" style={{ color: "var(--rose)" }}>
             {t("custom.eyebrow")}
           </span>
@@ -85,18 +88,26 @@ export default function CustomOrderSection({ categories }: { categories: Categor
           <p className="mt-3" style={{ color: "var(--ink-soft)" }}>
             {t("custom.sub")}
           </p>
-        </div>
+        </Reveal>
 
         {status === "success" ? (
-          <div className="card p-8 text-center max-w-2xl mx-auto">
-            <div
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.4, ease: EASE }}
+            className="card p-8 text-center max-w-2xl mx-auto"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.4, ease: EASE, delay: 0.1, type: "spring", stiffness: 260, damping: 18 }}
               className="mx-auto w-14 h-14 rounded-full flex items-center justify-center"
               style={{ background: "var(--teal)" }}
             >
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--beige-100)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 6L9 17l-5-5" />
               </svg>
-            </div>
+            </motion.div>
             <h3 className="font-display mt-4 text-2xl" style={{ color: "var(--teal)" }}>
               {t("custom.successTitle")}
             </h3>
@@ -106,14 +117,16 @@ export default function CustomOrderSection({ categories }: { categories: Categor
             <button className="btn btn-outline mt-6 px-6 py-2.5" onClick={resetForm}>
               {t("custom.sendAnother")}
             </button>
-          </div>
+          </motion.div>
         ) : (
           <div className="grid lg:grid-cols-2 gap-8">
             <div>
               <label className="block mb-2 text-sm font-semibold" style={{ color: "var(--ink-soft)" }}>
                 {t("custom.uploadLabel")}
               </label>
-              <div
+              <motion.div
+                animate={{ scale: dragging ? 1.02 : 1 }}
+                transition={{ duration: 0.2, ease: EASE }}
                 className={`dropzone p-6 sm:p-8 text-center cursor-pointer${dragging ? " drag" : ""}`}
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => {
@@ -158,7 +171,7 @@ export default function CustomOrderSection({ categories }: { categories: Categor
                     </button>
                   </div>
                 )}
-              </div>
+              </motion.div>
 
               <div className="mt-6 card p-5">
                 <p className="text-sm font-semibold" style={{ color: "var(--teal)" }}>
@@ -221,9 +234,14 @@ export default function CustomOrderSection({ categories }: { categories: Categor
                 </p>
               )}
 
-              <button type="submit" className="btn btn-rose w-full py-3.5 disabled:opacity-60" disabled={status === "submitting"}>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                type="submit"
+                className="btn btn-rose w-full py-3.5 disabled:opacity-60"
+                disabled={status === "submitting"}
+              >
                 {status === "submitting" ? t("custom.submitting") : t("custom.submit")}
-              </button>
+              </motion.button>
             </form>
           </div>
         )}

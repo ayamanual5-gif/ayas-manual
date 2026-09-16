@@ -1,6 +1,9 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
+import Reveal from "./motion/Reveal";
+import { StaggerContainer, StaggerItem } from "./motion/Stagger";
 
 const socialLabels = ["Instagram", "WhatsApp", "Pinterest"];
 
@@ -39,7 +42,7 @@ export default function ContactSection() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
-      <div className="max-w-xl">
+      <Reveal className="max-w-xl">
         <span className="eyebrow" style={{ color: "var(--rose)" }}>
           {t("contact.eyebrow")}
         </span>
@@ -49,11 +52,11 @@ export default function ContactSection() {
         <p className="mt-3" style={{ color: "var(--ink-soft)" }}>
           {t("contact.sub")}
         </p>
-      </div>
+      </Reveal>
 
-      <div className="mt-10 grid sm:grid-cols-3 gap-5">
+      <StaggerContainer className="mt-10 grid sm:grid-cols-3 gap-5">
         {cards.map((card) => (
-          <div key={card.label} className="card p-6 flex flex-col items-start gap-3">
+          <StaggerItem key={card.label} className="card p-6 flex flex-col items-start gap-3">
             <div
               className="icon-tile w-12 flex items-center justify-center"
               style={{ background: "rgba(0,80,85,.1)", color: "var(--teal)" }}
@@ -70,19 +73,21 @@ export default function ContactSection() {
                 {card.value}
               </p>
             </div>
-          </div>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
 
-      <div className="mt-10 flex items-center gap-3">
+      <Reveal delay={0.1} className="mt-10 flex items-center gap-3">
         <span className="text-sm font-semibold" style={{ color: "var(--ink-soft)" }}>
           {t("footer.followTitle")}
         </span>
         <div className="flex gap-3">
           {socialLabels.map((label) => (
-            <a
+            <motion.a
               key={label}
               href="#"
+              whileHover={{ y: -3, scale: 1.08 }}
+              whileTap={{ scale: 0.94 }}
               className="w-10 h-10 rounded-full flex items-center justify-center"
               style={{ background: "var(--beige-100)", border: "1px solid var(--beige-200)", color: "var(--teal)" }}
               aria-label={label}
@@ -90,10 +95,10 @@ export default function ContactSection() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="9" />
               </svg>
-            </a>
+            </motion.a>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

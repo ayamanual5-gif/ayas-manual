@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { useToast } from "@/context/ToastContext";
+import Reveal from "./motion/Reveal";
 
 export default function NewsletterSection() {
   const { t } = useLang();
@@ -18,7 +20,7 @@ export default function NewsletterSection() {
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
-      <div className="card p-8 sm:p-10 grid sm:grid-cols-2 gap-6 items-center">
+      <Reveal className="card p-8 sm:p-10 grid sm:grid-cols-2 gap-6 items-center">
         <div>
           <h3 className="font-display text-2xl sm:text-3xl" style={{ color: "var(--teal)" }}>
             {t("news.title")}
@@ -37,9 +39,11 @@ export default function NewsletterSection() {
             className="flex-1 rounded-full px-5 py-3 border"
             style={{ background: "var(--beige-100)", borderColor: "var(--beige-200)" }}
           />
-          <button className="btn btn-primary px-6 py-3">{t("news.btn")}</button>
+          <motion.button whileTap={{ scale: 0.96 }} className="btn btn-primary px-6 py-3">
+            {t("news.btn")}
+          </motion.button>
         </form>
-      </div>
+      </Reveal>
     </section>
   );
 }

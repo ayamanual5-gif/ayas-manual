@@ -1,6 +1,7 @@
 "use client";
 
 import { useLang } from "@/context/LangContext";
+import { StaggerContainer, StaggerItem } from "./motion/Stagger";
 
 export default function ValueStrip() {
   const { t } = useLang();
@@ -29,16 +30,16 @@ export default function ValueStrip() {
 
   return (
     <section className="text-beige-100" style={{ background: "var(--teal)" }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid sm:grid-cols-3 gap-5 text-sm">
+      <StaggerContainer className="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid sm:grid-cols-3 gap-5 text-sm">
         {values.map((v) => (
-          <div key={v.key} className="flex items-center gap-3">
+          <StaggerItem key={v.key} className="flex items-center gap-3">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               {v.icon}
             </svg>
             <span>{t(v.key)}</span>
-          </div>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </section>
   );
 }

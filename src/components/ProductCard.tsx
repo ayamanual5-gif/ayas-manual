@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import ProductVisual from "./ProductVisual";
+import { staggerItem } from "./motion/Stagger";
+import { EASE } from "./motion/variants";
 import type { Product } from "@/lib/types";
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -18,9 +21,16 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <div className="card p-4 flex flex-col group">
-      <Link href={`/shop/${product.id}`} className="relative block">
-        <ProductVisual product={product} />
+    <motion.div
+      variants={staggerItem}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.25, ease: EASE }}
+      className="card p-4 flex flex-col group"
+    >
+      <Link href={`/shop/${product.id}`} className="relative block overflow-hidden rounded-[18px]">
+        <motion.div whileHover={{ scale: 1.06 }} transition={{ duration: 0.4, ease: EASE }}>
+          <ProductVisual product={product} />
+        </motion.div>
         {product.isNew && (
           <span
             className="absolute top-2 chip !border-0 !py-1 !px-2.5 text-[10px]"
@@ -45,10 +55,14 @@ export default function ProductCard({ product }: { product: Product }) {
         <Link href={`/shop/${product.id}`} className="btn btn-outline flex-1 !py-2 text-xs">
           {t("product.view")}
         </Link>
-        <button className="btn btn-primary flex-1 !py-2 text-xs" onClick={handleAdd}>
+        <motion.button
+          whileTap={{ scale: 0.94 }}
+          className="btn btn-primary flex-1 !py-2 text-xs"
+          onClick={handleAdd}
+        >
           {t("product.add")}
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }

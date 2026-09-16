@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { useCart } from "@/context/CartContext";
 import { fetchSettings, submitOrder } from "@/lib/api";
 import ProductVisual from "@/components/ProductVisual";
+import { EASE } from "@/components/motion/variants";
 import type { OrderItem } from "@/lib/types";
 
 type PaymentMethod = "instapay" | "vodafone_cash";
@@ -73,15 +75,23 @@ export default function CheckoutPage() {
 
   if (status === "success") {
     return (
-      <section className="max-w-2xl mx-auto px-4 sm:px-6 py-20 text-center">
-        <div
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: EASE }}
+        className="max-w-2xl mx-auto px-4 sm:px-6 py-20 text-center"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.1, type: "spring", stiffness: 260, damping: 18 }}
           className="mx-auto w-16 h-16 rounded-full flex items-center justify-center"
           style={{ background: "var(--teal)" }}
         >
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--beige-100)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>
-        </div>
+        </motion.div>
         <h1 className="font-display mt-5 text-3xl" style={{ color: "var(--teal)" }}>
           {t("checkout.successTitle")}
         </h1>
@@ -91,7 +101,7 @@ export default function CheckoutPage() {
         <Link href="/" className="btn btn-primary mt-8 px-7 py-3.5 inline-flex">
           {t("checkout.backHome")}
         </Link>
-      </section>
+      </motion.section>
     );
   }
 
@@ -182,7 +192,8 @@ export default function CheckoutPage() {
 
             <div className="grid sm:grid-cols-2 gap-3">
               {(["instapay", "vodafone_cash"] as PaymentMethod[]).map((method) => (
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.96 }}
                   type="button"
                   key={method}
                   onClick={() => setPaymentMethod(method)}
@@ -194,7 +205,7 @@ export default function CheckoutPage() {
                   }}
                 >
                   {method === "instapay" ? t("checkout.paymentInstaPay") : t("checkout.paymentVodafone")}
-                </button>
+                </motion.button>
               ))}
             </div>
 
@@ -227,9 +238,14 @@ export default function CheckoutPage() {
             </p>
           )}
 
-          <button type="submit" className="btn btn-primary w-full py-3.5 disabled:opacity-60" disabled={status === "submitting"}>
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            type="submit"
+            className="btn btn-primary w-full py-3.5 disabled:opacity-60"
+            disabled={status === "submitting"}
+          >
             {status === "submitting" ? t("checkout.submitting") : t("checkout.submit")}
-          </button>
+          </motion.button>
         </form>
       </div>
     </section>

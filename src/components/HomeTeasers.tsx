@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useLang } from "@/context/LangContext";
+import { StaggerContainer, StaggerItem } from "./motion/Stagger";
 
 export default function HomeTeasers() {
   const { t } = useLang();
 
   return (
     <section className="py-16 sm:py-20" style={{ background: "var(--beige-100)" }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-6">
-        <div className="card p-8 flex flex-col justify-between">
+      <StaggerContainer className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-6">
+        <StaggerItem className="card p-8 flex flex-col justify-between">
           <div>
             <span className="eyebrow" style={{ color: "var(--rose)" }}>
               {t("about.eyebrow")}
@@ -24,9 +25,9 @@ export default function HomeTeasers() {
           <Link href="/about" className="btn btn-outline px-6 py-3 mt-6 self-start">
             {t("home.aboutTeaserCta")}
           </Link>
-        </div>
+        </StaggerItem>
 
-        <div className="card p-8 flex flex-col justify-between relative overflow-hidden">
+        <StaggerItem className="card p-8 flex flex-col justify-between relative overflow-hidden">
           <div className="blob" style={{ width: 140, height: 140, background: "var(--olive)", top: -30, insetInlineEnd: -30 }} />
           <div className="relative">
             <span className="eyebrow" style={{ color: "var(--rose)" }}>
@@ -42,8 +43,8 @@ export default function HomeTeasers() {
           <Link href="/custom-order" className="btn btn-rose px-6 py-3 mt-6 self-start relative">
             {t("home.customTeaserCta")}
           </Link>
-        </div>
-      </div>
+        </StaggerItem>
+      </StaggerContainer>
     </section>
   );
 }
