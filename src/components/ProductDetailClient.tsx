@@ -93,6 +93,57 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </span>
             </div>
           )}
+
+          {images.length > 1 && (
+            <>
+              <motion.button
+                type="button"
+                aria-label="Previous image"
+                style={{ y: "-50%" }}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                className="gallery-arrow gallery-arrow-prev"
+                onClick={() => goTo(activeIndex - 1)}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ transform: lang === "ar" ? "scaleX(-1)" : undefined }}
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </motion.button>
+              <motion.button
+                type="button"
+                aria-label="Next image"
+                style={{ y: "-50%" }}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                className="gallery-arrow gallery-arrow-next"
+                onClick={() => goTo(activeIndex + 1)}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ transform: lang === "ar" ? "scaleX(-1)" : undefined }}
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </motion.button>
+            </>
+          )}
         </div>
 
         {images.length > 1 && (

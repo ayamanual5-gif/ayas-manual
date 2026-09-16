@@ -17,13 +17,18 @@ export default function CircularShowcase({ products }: { products: Product[] }) 
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
+  function step(delta: number) {
+    setIndex((i) => (i + delta + items.length) % items.length);
+  }
+
+  // Re-arms on every index change (manual or automatic), so clicking an
+  // arrow resets the countdown instead of the auto-cycle jumping right after.
   useEffect(() => {
     if (items.length < 2 || paused) return;
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % items.length);
-    }, CYCLE_MS);
-    return () => clearInterval(id);
-  }, [items.length, paused]);
+    const id = setTimeout(() => step(1), CYCLE_MS);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, items.length, paused]);
 
   if (items.length === 0) {
     return <FallbackArt />;
@@ -61,6 +66,63 @@ export default function CircularShowcase({ products }: { products: Product[] }) 
             </AnimatePresence>
           </motion.div>
         </Link>
+
+        {items.length > 1 && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Previous product"
+              style={{ y: "-50%" }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              className="orbit-arrow orbit-arrow-prev"
+              onClick={(e) => {
+                e.preventDefault();
+                step(-1);
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ transform: lang === "ar" ? "scaleX(-1)" : undefined }}
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </motion.button>
+            <motion.button
+              type="button"
+              aria-label="Next product"
+              style={{ y: "-50%" }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              className="orbit-arrow orbit-arrow-next"
+              onClick={(e) => {
+                e.preventDefault();
+                step(1);
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ transform: lang === "ar" ? "scaleX(-1)" : undefined }}
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </motion.button>
+          </>
+        )}
       </div>
 
       {items.length > 1 && (
