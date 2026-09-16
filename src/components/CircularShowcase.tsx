@@ -1,60 +1,75 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 import ProductVisual from "./ProductVisual";
 import { useLang } from "@/context/LangContext";
 import type { Product } from "@/lib/types";
-import { cssVars } from "@/lib/cssVars";
+import { EASE } from "./motion/variants";
 
 const MAX_ITEMS = 6;
-const ORBIT_DURATION = 34; // seconds for one full rotation — slow and calm, not distracting
+const CYCLE_MS = 3200;
 
 export default function CircularShowcase({ products }: { products: Product[] }) {
   const { lang } = useLang();
   const items = useMemo(() => products.slice(0, MAX_ITEMS), [products]);
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (items.length < 2 || paused) return;
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % items.length);
+    }, CYCLE_MS);
+    return () => clearInterval(id);
+  }, [items.length, paused]);
 
   if (items.length === 0) {
     return <FallbackArt />;
   }
 
-  const angleStep = 360 / items.length;
+  const current = items[index];
 
   return (
-    <div className="orbit-wrapper relative mx-auto" aria-label="Featured products">
-      <div className="orbit-hub hero-orbit" />
-      <div className="orbit-track" aria-hidden="true" />
-
-      {items.map((product, i) => {
-        const angle = i * angleStep;
-        const phaseDelay = -(i / items.length) * ORBIT_DURATION;
-        const isNear = i % 2 === 0;
-
-        return (
-          <div
-            key={product.id}
-            className="orbit-item"
-            style={cssVars({
-              "--orbit-duration": `${ORBIT_DURATION}s`,
-              "--phase-delay": `${phaseDelay}s`,
-              "--static-angle": `${angle}deg`,
-            })}
+    <div className="flex flex-col items-center">
+      <div
+        className="orbit-wrapper relative"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onFocus={() => setPaused(true)}
+        onBlur={() => setPaused(false)}
+      >
+        <Link href={`/shop/${current.id}`} title={current.name[lang]} className="block w-full h-full">
+          <motion.div
+            className="orbit-frame hero-orbit"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.25, ease: EASE }}
           >
-            <Link href={`/shop/${product.id}`} className="block w-full h-full" title={product.name[lang]}>
+            <AnimatePresence mode="wait">
               <motion.div
-                className={`orbit-thumb ${isNear ? "orbit-thumb-near" : "orbit-thumb-far"}`}
-                whileHover={{ scale: 1.22 }}
-                whileFocus={{ scale: 1.22 }}
-                whileTap={{ scale: 0.94 }}
-                transition={{ type: "spring", stiffness: 260, damping: 18 }}
+                key={current.id}
+                className="w-full h-full"
+                initial={{ opacity: 0, scale: 1.08 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.94 }}
+                transition={{ duration: 0.55, ease: EASE }}
               >
-                <ProductVisual product={product} className="w-full h-full" />
+                <ProductVisual product={current} className="w-full h-full" />
               </motion.div>
-            </Link>
-          </div>
-        );
-      })}
+            </AnimatePresence>
+          </motion.div>
+        </Link>
+      </div>
+
+      {items.length > 1 && (
+        <div className="orbit-dots">
+          {items.map((p, i) => (
+            <span key={p.id} className={`orbit-dot${i === index ? " active" : ""}`} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
