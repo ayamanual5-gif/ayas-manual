@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
@@ -18,6 +18,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const { showToast } = useToast();
   const [activeIndex, setActiveIndex] = useState(0);
   const [added, setAdded] = useState(false);
+  const ctaRef = useRef<HTMLButtonElement>(null);
+  const ctaInView = useInView(ctaRef, { margin: "-80px 0px 0px 0px" });
 
   const images = product.images ?? [];
   const hasImages = images.length > 0;
@@ -208,6 +210,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           {product.price} {t("currency")}
         </motion.div>
         <motion.button
+          ref={ctaRef}
           variants={fadeUp}
           whileTap={{ scale: 0.96 }}
           className="btn btn-primary w-full sm:w-auto px-10 py-3.5 mt-6 relative overflow-hidden"
@@ -242,6 +245,30 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           </AnimatePresence>
         </motion.button>
       </div>
+
+      <AnimatePresence>
+        {!ctaInView && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ duration: 0.25, ease: EASE }}
+            className="lg:hidden fixed bottom-0 inset-x-0 z-30 flex items-center gap-3 px-4 py-3"
+            style={{
+              background: "var(--beige-100)",
+              borderTop: "1px solid var(--beige-200)",
+              paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))",
+            }}
+          >
+            <div className="font-bold text-lg shrink-0" style={{ color: "var(--teal)" }}>
+              {product.price} {t("currency")}
+            </div>
+            <motion.button whileTap={{ scale: 0.96 }} className="btn btn-primary flex-1 py-3" onClick={handleAdd}>
+              {added ? t("toast.added") : t("product.add")}
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

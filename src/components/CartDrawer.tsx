@@ -6,11 +6,13 @@ import { useLang } from "@/context/LangContext";
 import { useCart } from "@/context/CartContext";
 import ProductVisual from "./ProductVisual";
 import { EASE } from "./motion/variants";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 export default function CartDrawer() {
   const { lang, t } = useLang();
   const { items, changeQty, subtotal, isOpen, closeCart } = useCart();
   const router = useRouter();
+  useBodyScrollLock(isOpen);
 
   // The drawer is anchored with a logical inset-inline-end, which flips sides
   // between LTR and RTL — so the "hidden" offset must flip sign too, or the
@@ -75,10 +77,10 @@ export default function CartDrawer() {
                         <p className="text-xs" style={{ color: "var(--ink-soft)" }}>
                           {product.price} {t("currency")}
                         </p>
-                        <div className="mt-1.5 flex items-center gap-2">
+                        <div className="mt-1.5 flex items-center gap-1">
                           <motion.button
                             whileTap={{ scale: 0.85 }}
-                            className="w-6 h-6 rounded-full border flex items-center justify-center text-xs"
+                            className="w-9 h-9 -m-1.5 rounded-full border flex items-center justify-center text-sm"
                             style={{ borderColor: "var(--beige-200)" }}
                             onClick={() => changeQty(product.id, -1)}
                           >
@@ -95,7 +97,7 @@ export default function CartDrawer() {
                           </motion.span>
                           <motion.button
                             whileTap={{ scale: 0.85 }}
-                            className="w-6 h-6 rounded-full border flex items-center justify-center text-xs"
+                            className="w-9 h-9 -m-1.5 rounded-full border flex items-center justify-center text-sm"
                             style={{ borderColor: "var(--beige-200)" }}
                             onClick={() => changeQty(product.id, 1)}
                           >

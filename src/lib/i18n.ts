@@ -162,6 +162,13 @@ export const translations = {
   "home.shopTeaserEyebrow": { ar: "أحدث القطع", en: "Latest Pieces" },
   "home.shopTeaserTitle": { ar: "لمحة من المتجر", en: "A peek into the shop" },
   "home.shopTeaserCta": { ar: "تصفحي المتجر كامل", en: "Browse the full shop" },
+  "home.shopMoreTitle": { ar: "دي مجرد البداية", en: "This is just the beginning" },
+  "home.shopMoreBody": {
+    ar: "اكتشفي باقي القطع والتصميمات في المتجر.",
+    en: "Discover the rest of the pieces and designs in the shop.",
+  },
+  "home.shopMoreCta": { ar: "تصفحي المتجر كامل", en: "Browse the full shop" },
+  "product.discover": { ar: "اكتشفي القطعة", en: "Discover this piece" },
 
   "home.aboutTeaserCta": { ar: "اعرفي قصتنا", en: "Read our story" },
 

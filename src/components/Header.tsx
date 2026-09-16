@@ -8,6 +8,7 @@ import { useLang } from "@/context/LangContext";
 import { useCart } from "@/context/CartContext";
 import Logo from "./Logo";
 import { EASE } from "./motion/variants";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 import type { TranslationKey } from "@/lib/i18n";
 
 const navLinks: { href: string; key: TranslationKey }[] = [
@@ -22,6 +23,13 @@ export default function Header() {
   const { count, openCart } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  useBodyScrollLock(mobileOpen);
+
+  // Defensive close on route change (e.g. browser Back/Forward), in addition
+  // to each link's own onClick handler.
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   const [bump, setBump] = useState(false);
   const prevCount = useRef(count);

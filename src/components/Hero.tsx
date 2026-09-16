@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { cssVars } from "@/lib/cssVars";
-import CircularShowcase from "./CircularShowcase";
+import HandmadeShowcase from "./HandmadeShowcase";
 import { EASE, staggerContainer, fadeUp } from "./motion/variants";
 import type { Product } from "@/lib/types";
 
@@ -29,49 +29,56 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-16 sm:pt-16 sm:pb-20 relative grid lg:grid-cols-2 gap-10 items-center">
-        <motion.div variants={staggerContainer(0.12)} initial="hidden" animate="show">
-          <motion.span variants={fadeUp} className="chip inline-block">
-            {t("hero.eyebrow")}
-          </motion.span>
-          <motion.h1
-            variants={fadeUp}
-            className="font-display mt-5 text-4xl sm:text-5xl xl:text-[3.4rem] leading-[1.15]"
-            style={{ color: "var(--teal)" }}
-          >
-            {t("hero.headline")}
-          </motion.h1>
-          <motion.p variants={fadeUp} className="mt-5 text-base sm:text-lg max-w-md" style={{ color: "var(--ink-soft)" }}>
-            {t("hero.sub")}
-          </motion.p>
-          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={{ duration: 0.18, ease: EASE }}>
-              <Link href="/shop" className="btn btn-primary px-7 py-3.5">
-                {t("hero.cta1")}
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={{ duration: 0.18, ease: EASE }}>
-              <Link href="/about" className="btn btn-outline px-7 py-3.5">
-                {t("hero.cta2")}
-              </Link>
-            </motion.div>
+      <motion.div
+        className="hero-grid max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-16 sm:pt-16 sm:pb-20 relative"
+        variants={staggerContainer(0.12)}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.span variants={fadeUp} className="hero-area-label chip inline-block">
+          {t("hero.eyebrow")}
+        </motion.span>
+
+        <motion.h1
+          variants={fadeUp}
+          className="hero-area-headline font-display mt-5 text-4xl sm:text-5xl xl:text-[3.4rem] leading-[1.15]"
+          style={{ color: "var(--teal)" }}
+        >
+          {t("hero.headline")}
+        </motion.h1>
+
+        <motion.p variants={fadeUp} className="hero-area-desc mt-5 text-base sm:text-lg max-w-md" style={{ color: "var(--ink-soft)" }}>
+          {t("hero.sub")}
+        </motion.p>
+
+        <motion.div
+          className="hero-area-visual flex items-center justify-center py-6 lg:py-0"
+          initial={{ opacity: 0, scale: 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, ease: EASE, delay: 0.2 }}
+        >
+          <HandmadeShowcase products={products} />
+        </motion.div>
+
+        <motion.div variants={fadeUp} className="hero-area-ctas mt-8 flex flex-wrap gap-3">
+          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={{ duration: 0.18, ease: EASE }}>
+            <Link href="/shop" className="btn btn-primary px-7 py-3.5">
+              {t("hero.cta1")}
+            </Link>
           </motion.div>
-          <motion.div variants={fadeUp} className="mt-9 flex flex-wrap gap-2.5">
-            <span className="chip">{t("hero.badge1")}</span>
-            <span className="chip">{t("hero.badge2")}</span>
-            <span className="chip">{t("hero.badge3")}</span>
+          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={{ duration: 0.18, ease: EASE }}>
+            <Link href="/about" className="btn btn-outline px-7 py-3.5">
+              {t("hero.cta2")}
+            </Link>
           </motion.div>
         </motion.div>
 
-        <motion.div
-          className="relative flex items-center justify-center py-6"
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-        >
-          <CircularShowcase products={products} />
+        <motion.div variants={fadeUp} className="hero-area-badges mt-9 flex flex-wrap gap-2.5">
+          <span className="chip">{t("hero.badge1")}</span>
+          <span className="chip">{t("hero.badge2")}</span>
+          <span className="chip">{t("hero.badge3")}</span>
         </motion.div>
-      </div>
+      </motion.div>
 
       <div className="scallop scallop-down" style={cssVars({ "--edge": "var(--teal)" })} />
     </section>

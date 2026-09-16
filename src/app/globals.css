@@ -286,53 +286,93 @@ textarea {
   }
 }
 
-/* Circular product showcase (Hero) — a single round frame that cycles
-   through product photos with a crossfade, rather than several items
-   orbiting each other. */
-.orbit-wrapper {
-  --orbit-size: 260px;
-  width: var(--orbit-size);
-  height: var(--orbit-size);
-}
-@media (min-width: 480px) {
-  .orbit-wrapper {
-    --orbit-size: 320px;
-  }
+/* Hero layout — deliberately reordered per breakpoint (not just stacked):
+   mobile shows the product visual right after the description and before
+   the CTAs; desktop places all text in one column beside the visual. */
+.hero-grid {
+  display: grid;
+  gap: 0;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "label"
+    "headline"
+    "desc"
+    "visual"
+    "ctas"
+    "badges";
 }
 @media (min-width: 1024px) {
-  .orbit-wrapper {
-    --orbit-size: 380px;
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2.5rem;
+    align-items: center;
+    grid-template-areas:
+      "label visual"
+      "headline visual"
+      "desc visual"
+      "ctas visual"
+      "badges visual";
   }
 }
-.orbit-frame {
+.hero-area-label {
+  grid-area: label;
+}
+.hero-area-headline {
+  grid-area: headline;
+}
+.hero-area-desc {
+  grid-area: desc;
+}
+.hero-area-visual {
+  grid-area: visual;
+}
+.hero-area-ctas {
+  grid-area: ctas;
+}
+.hero-area-badges {
+  grid-area: badges;
+}
+
+/* Hero handmade showcase — a single rounded frame where a "thread" outline
+   draws itself, then the real product photo fades in inside it. */
+.hero-visual {
+  position: relative;
   width: 100%;
-  height: 100%;
-  border-radius: 9999px;
-  overflow: hidden;
+  max-width: 320px;
+  margin-inline: auto;
+}
+@media (min-width: 1024px) {
+  .hero-visual {
+    max-width: 380px;
+  }
+}
+.hero-visual-backdrop {
+  position: absolute;
+  inset: 4%;
+  border-radius: 28px;
   background: var(--beige-100);
-  border: 3px solid var(--beige-200);
-  box-shadow: 0 14px 34px -14px rgba(0, 80, 85, 0.35);
+  border: 1px solid var(--beige-200);
+}
+.hero-visual-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
   cursor: pointer;
 }
-.orbit-arrow {
+.hero-thread-svg {
   position: absolute;
-  top: 50%;
-  width: 34px;
-  height: 34px;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--beige-100);
-  border: 1.5px solid var(--beige-200);
-  color: var(--teal);
-  box-shadow: 0 6px 16px -8px rgba(0, 80, 85, 0.35);
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
-.orbit-arrow-prev {
-  inset-inline-start: -6px;
-}
-.orbit-arrow-next {
-  inset-inline-end: -6px;
+.hero-photo {
+  position: absolute;
+  inset: 12%;
+  border-radius: 22%;
+  overflow: hidden;
+  box-shadow: 0 16px 36px -16px rgba(0, 80, 85, 0.4);
+  transform-style: preserve-3d;
 }
 .gallery-arrow {
   position: absolute;
