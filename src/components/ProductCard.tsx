@@ -1,18 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useLang } from "@/context/LangContext";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import ProductVisual from "./ProductVisual";
 import type { Product } from "@/lib/types";
 
-export default function ProductCard({
-  product,
-  onView,
-}: {
-  product: Product;
-  onView: (product: Product) => void;
-}) {
+export default function ProductCard({ product }: { product: Product }) {
   const { lang, t } = useLang();
   const { addToCart } = useCart();
   const { showToast } = useToast();
@@ -24,7 +19,7 @@ export default function ProductCard({
 
   return (
     <div className="card p-4 flex flex-col group">
-      <div className="relative">
+      <Link href={`/shop/${product.id}`} className="relative block">
         <ProductVisual product={product} />
         {product.isNew && (
           <span
@@ -34,8 +29,12 @@ export default function ProductCard({
             {t("product.new")}
           </span>
         )}
-      </div>
-      <h3 className="mt-4 font-semibold leading-snug">{product.name[lang]}</h3>
+      </Link>
+      <Link href={`/shop/${product.id}`}>
+        <h3 className="mt-4 font-semibold leading-snug hover:text-[var(--rose)] transition-colors">
+          {product.name[lang]}
+        </h3>
+      </Link>
       <p className="mt-1 text-xs" style={{ color: "var(--ink-soft)" }}>
         {product.tag[lang]}
       </p>
@@ -43,9 +42,9 @@ export default function ProductCard({
         {product.price} {t("currency")}
       </div>
       <div className="mt-4 flex gap-2">
-        <button className="btn btn-outline flex-1 !py-2 text-xs" onClick={() => onView(product)}>
+        <Link href={`/shop/${product.id}`} className="btn btn-outline flex-1 !py-2 text-xs">
           {t("product.view")}
-        </button>
+        </Link>
         <button className="btn btn-primary flex-1 !py-2 text-xs" onClick={handleAdd}>
           {t("product.add")}
         </button>

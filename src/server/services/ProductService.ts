@@ -13,7 +13,7 @@ function toProduct(row: {
   name: unknown;
   tag: unknown;
   desc: unknown;
-  image: string | null;
+  images: unknown;
 }): Product {
   return {
     id: row.id,
@@ -25,7 +25,7 @@ function toProduct(row: {
     name: row.name as LocalizedText,
     tag: row.tag as LocalizedText,
     desc: row.desc as LocalizedText,
-    image: row.image,
+    images: Array.isArray(row.images) ? (row.images as string[]) : [],
   };
 }
 

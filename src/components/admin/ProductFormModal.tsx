@@ -34,6 +34,11 @@ interface FormState {
   isNew: boolean;
 }
 
+interface NewImage {
+  file: File;
+  previewUrl: string;
+}
+
 function emptyForm(defaultCategory: string): FormState {
   return {
     nameAr: "",
@@ -85,8 +90,8 @@ export default function ProductFormModal({
   const [form, setForm] = useState<FormState>(() =>
     product ? fromProduct(product) : emptyForm(selectableCategories[0]?.key ?? "")
   );
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [newImages, setNewImages] = useState<NewImage[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,11 +99,18 @@ export default function ProductFormModal({
   useEffect(() => {
     if (!open) return;
     setForm(product ? fromProduct(product) : emptyForm(selectableCategories[0]?.key ?? ""));
-    setImageFile(null);
-    setImagePreview(product?.image ? resolveImageUrl(product.image) : null);
+    setExistingImages(product?.images ?? []);
+    setNewImages([]);
     setError("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, product]);
+
+  // Release object URLs created for new-image previews once they're no longer needed.
+  useEffect(() => {
+    return () => {
+      newImages.forEach((img) => URL.revokeObjectURL(img.previewUrl));
+    };
+  }, [newImages]);
 
   if (!open) return null;
 
@@ -106,12 +118,23 @@ export default function ProductFormModal({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleFile(file: File | null | undefined) {
-    if (!file || !file.type.startsWith("image/")) return;
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onload = (e) => setImagePreview(e.target?.result as string);
-    reader.readAsDataURL(file);
+  function addFiles(files: FileList | null) {
+    if (!files) return;
+    const accepted = Array.from(files)
+      .filter((file) => file.type.startsWith("image/"))
+      .map((file) => ({ file, previewUrl: URL.createObjectURL(file) }));
+    setNewImages((prev) => [...prev, ...accepted]);
+  }
+
+  function removeExistingImage(url: string) {
+    setExistingImages((prev) => prev.filter((u) => u !== url));
+  }
+
+  function removeNewImage(index: number) {
+    setNewImages((prev) => {
+      URL.revokeObjectURL(prev[index].previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -142,7 +165,8 @@ export default function ProductFormModal({
       fd.append("tint", form.tint);
       fd.append("price", form.price);
       fd.append("isNew", String(form.isNew));
-      if (imageFile) fd.append("image", imageFile);
+      existingImages.forEach((url) => fd.append("existingImages", url));
+      newImages.forEach((img) => fd.append("images", img.file));
 
       const saved =
         isEdit && product ? await updateAdminProduct(product.id, fd) : await createAdminProduct(fd);
@@ -194,12 +218,12 @@ export default function ProductFormModal({
           </div>
 
           <div className="field">
-            <label>الوصف التفصيلي (عربي)</label>
-            <textarea rows={2} value={form.descAr} onChange={(e) => updateField("descAr", e.target.value)} />
+            <label>الوصف التفصيلي (عربي) — بيظهر كامل في صفحة المنتج</label>
+            <textarea rows={3} value={form.descAr} onChange={(e) => updateField("descAr", e.target.value)} />
           </div>
           <div className="field">
-            <label>الوصف التفصيلي (إنجليزي)</label>
-            <textarea rows={2} value={form.descEn} onChange={(e) => updateField("descEn", e.target.value)} />
+            <label>الوصف التفصيلي (إنجليزي) — بيظهر كامل في صفحة المنتج</label>
+            <textarea rows={3} value={form.descEn} onChange={(e) => updateField("descEn", e.target.value)} />
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4">
@@ -237,7 +261,7 @@ export default function ProductFormModal({
           </div>
 
           <div className="field">
-            <label>اللون المميز (يظهر لو مفيش صورة حقيقية)</label>
+            <label>اللون المميز (يظهر لو مفيش صور حقيقية)</label>
             <div className="flex gap-3">
               {TINT_OPTIONS.map((opt) => (
                 <button
@@ -268,26 +292,66 @@ export default function ProductFormModal({
           </label>
 
           <div className="field">
-            <label>صورة المنتج (اختياري — لو مفيش، هيظهر شكل أيقوني بدلها)</label>
-            <div
-              className="dropzone p-4 text-center cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
-            >
+            <label>صور المنتج (اختياري — لو مفيش، هيظهر شكل أيقوني بدلها. أول صورة بتبقى الغلاف)</label>
+
+            {(existingImages.length > 0 || newImages.length > 0) && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
+                {existingImages.map((url) => (
+                  <div key={url} className="relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={resolveImageUrl(url)}
+                      alt="صورة المنتج"
+                      className="w-full aspect-square object-cover rounded-xl"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeExistingImage(url)}
+                      className="absolute -top-2 -end-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                      style={{ background: "var(--rose)", color: "#fff" }}
+                      aria-label="إزالة الصورة"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                {newImages.map((img, index) => (
+                  <div key={img.previewUrl} className="relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={img.previewUrl}
+                      alt="صورة جديدة"
+                      className="w-full aspect-square object-cover rounded-xl"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeNewImage(index)}
+                      className="absolute -top-2 -end-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                      style={{ background: "var(--rose)", color: "#fff" }}
+                      aria-label="إزالة الصورة"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="dropzone p-4 text-center cursor-pointer" onClick={() => fileInputRef.current?.click()}>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 className="hidden"
-                onChange={(e) => handleFile(e.target.files?.[0])}
+                onChange={(e) => {
+                  addFiles(e.target.files);
+                  e.target.value = "";
+                }}
               />
-              {imagePreview ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={imagePreview} alt="preview" className="mx-auto rounded-xl max-h-40 object-cover" />
-              ) : (
-                <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
-                  اضغطي لاختيار صورة
-                </p>
-              )}
+              <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
+                اضغطي لإضافة صورة أو أكتر
+              </p>
             </div>
           </div>
 

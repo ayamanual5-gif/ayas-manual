@@ -45,7 +45,7 @@ const products: Omit<Product, "id">[] = [
       ar: "شنطة يومية فسيحة بحزام جلد طبيعي، معمولة بخيط قطني متين يتحمل الاستخدام اليومي.",
       en: "A spacious everyday tote with a genuine leather strap, woven from durable cotton cord that holds up to daily use.",
     },
-    image: r2Url(PRODUCT_1_IMAGE_KEY),
+    images: [r2Url(PRODUCT_1_IMAGE_KEY)],
   },
   {
     category: "bags",
@@ -59,6 +59,7 @@ const products: Omit<Product, "id">[] = [
       ar: "شنطة صغيرة بمربعات الجراني كلاسيك ملونة، مثالية للخروجات المسائية.",
       en: "A small bag made of classic colorful granny squares — perfect for evenings out.",
     },
+    images: [],
   },
   {
     category: "scarves",
@@ -72,6 +73,7 @@ const products: Omit<Product, "id">[] = [
       ar: "اسكارف دافئ بغرزة الريب الكثيفة، مثالي لأجواء الشتاء الباردة.",
       en: "A warm scarf in a dense rib stitch, made for the coldest winter days.",
     },
+    images: [],
   },
   {
     category: "scarves",
@@ -85,6 +87,7 @@ const products: Omit<Product, "id">[] = [
       ar: "اسكارف دائري بتدرج لوني ناعم من خيوط الموهير الرقيقة الدافئة.",
       en: "An infinity scarf with a soft color gradient, crocheted from delicate warm mohair yarn.",
     },
+    images: [],
   },
   {
     category: "accessories",
@@ -98,6 +101,7 @@ const products: Omit<Product, "id">[] = [
       ar: "طقم من 3 مشابك بزهور كروشيه صغيرة مطرزة بالخرز الملون.",
       en: "A set of 3 hair clips with tiny crochet flowers trimmed in colorful beads.",
     },
+    images: [],
   },
   {
     category: "accessories",
@@ -111,6 +115,7 @@ const products: Omit<Product, "id">[] = [
       ar: "إسورة أنيقة بغرزة الصدفة وزرار خشب طبيعي.",
       en: "An elegant cuff bracelet in shell stitch, finished with a natural wooden button.",
     },
+    images: [],
   },
   {
     category: "decor",
@@ -124,6 +129,7 @@ const products: Omit<Product, "id">[] = [
       ar: "معلقة نباتات بتقنية المكرمية من خيوط الجوت الطبيعية، تضيف لمسة بوهيمية لأي ركن.",
       en: "A plant hanger in macramé technique from natural jute cord, adding a boho touch to any corner.",
     },
+    images: [],
   },
   {
     category: "decor",
@@ -137,6 +143,7 @@ const products: Omit<Product, "id">[] = [
       ar: "مخدة زخرفية بملمس بارز من غرزة البوبكورن، تضيف دفء لأي صالة.",
       en: "A decorative pillow with raised popcorn-stitch texture, adding warmth to any living room.",
     },
+    images: [],
   },
   {
     category: "cardigans",
@@ -150,6 +157,7 @@ const products: Omit<Product, "id">[] = [
       ar: "كارديجان قصير بملمس الوافل الناعم، خفيف ومناسب لكل الفصول.",
       en: "A cropped cardigan with soft waffle texture — lightweight and wearable through every season.",
     },
+    images: [],
   },
   {
     category: "cardigans",
@@ -163,6 +171,7 @@ const products: Omit<Product, "id">[] = [
       ar: "كارديجان أوفرسايز بمربعات الجراني الملونة، قطعة مميزة تلفت الأنظار.",
       en: "An oversized cardigan in colorful granny squares — a statement piece that turns heads.",
     },
+    images: [],
   },
 ];
 

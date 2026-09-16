@@ -15,8 +15,8 @@ export interface Product {
   name: LocalizedText;
   tag: LocalizedText;
   desc: LocalizedText;
-  /** Real product photo uploaded from the admin panel — falls back to the icon tile when absent. */
-  image?: string | null;
+  /** Real product photos uploaded from the admin panel (first = cover) — falls back to the icon tile when empty. */
+  images: string[];
 }
 
 export interface Category {

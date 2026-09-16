@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { withAdmin } from "@/server/adminAuth";
-import { deleteImageFromR2, uploadFileToR2 } from "@/server/r2";
+import { deleteImagesFromR2, uploadFileToR2 } from "@/server/r2";
 import { productService } from "@/server/services/ProductService";
 import type { Product, ProductTint } from "@/lib/types";
 
@@ -31,7 +31,14 @@ export const PUT = withAdmin(async (request, context) => {
   const tint = formData.get("tint");
   const price = formData.get("price");
   const isNew = formData.get("isNew");
-  const image = formData.get("image");
+  const newImageFiles = formData
+    .getAll("images")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+  // Which of the product's CURRENT images the admin chose to keep — anything
+  // in `existing.images` but not in this list gets deleted from R2.
+  const existingImagesToKeep = formData.getAll("existingImages").filter(
+    (v): v is string => typeof v === "string"
+  );
 
   const patch: Partial<Product> = {};
 
@@ -65,10 +72,10 @@ export const PUT = withAdmin(async (request, context) => {
     };
   }
 
-  if (image instanceof File && image.size > 0) {
-    patch.image = await uploadFileToR2(image);
-    await deleteImageFromR2(existing.image);
-  }
+  const removedImages = existing.images.filter((url) => !existingImagesToKeep.includes(url));
+  const uploadedUrls = await Promise.all(newImageFiles.map((file) => uploadFileToR2(file)));
+  patch.images = [...existingImagesToKeep, ...uploadedUrls];
+  await deleteImagesFromR2(removedImages);
 
   const updated = await productService.update(id, patch);
   return NextResponse.json(updated);
@@ -83,7 +90,7 @@ export const DELETE = withAdmin(async (_request, context) => {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
-  await deleteImageFromR2(existing.image);
+  await deleteImagesFromR2(existing.images);
   await productService.remove(id);
   return NextResponse.json({ ok: true });
 });

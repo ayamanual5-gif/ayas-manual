@@ -38,10 +38,10 @@ export default function Hero() {
             {t("hero.sub")}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/#shop" className="btn btn-primary px-7 py-3.5">
+            <Link href="/shop" className="btn btn-primary px-7 py-3.5">
               {t("hero.cta1")}
             </Link>
-            <Link href="/#custom" className="btn btn-outline px-7 py-3.5">
+            <Link href="/about" className="btn btn-outline px-7 py-3.5">
               {t("hero.cta2")}
             </Link>
           </div>

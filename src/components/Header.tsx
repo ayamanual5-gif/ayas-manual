@@ -8,10 +8,10 @@ import Logo from "./Logo";
 import type { TranslationKey } from "@/lib/i18n";
 
 const navLinks: { href: string; key: TranslationKey }[] = [
-  { href: "/#shop", key: "nav.shop" },
-  { href: "/#custom", key: "nav.custom" },
-  { href: "/#about", key: "nav.about" },
-  { href: "/#contact", key: "nav.contact" },
+  { href: "/shop", key: "nav.shop" },
+  { href: "/custom-order", key: "nav.custom" },
+  { href: "/about", key: "nav.about" },
+  { href: "/contact", key: "nav.contact" },
 ];
 
 export default function Header() {
@@ -37,7 +37,7 @@ export default function Header() {
           </button>
 
           <Link
-            href="/#top"
+            href="/"
             className="flex-1 lg:flex-none flex items-center gap-2.5 justify-center lg:justify-start"
           >
             <Logo size={44} />

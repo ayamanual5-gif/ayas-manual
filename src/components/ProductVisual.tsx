@@ -13,12 +13,14 @@ export default function ProductVisual({
   product: Product;
   className?: string;
 }) {
-  if (product.image) {
+  const cover = product.images?.[0];
+
+  if (cover) {
     return (
       <div className={`icon-tile overflow-hidden ${className}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={resolveImageUrl(product.image)}
+          src={resolveImageUrl(cover)}
           alt={product.name.ar}
           className="w-full h-full object-cover"
         />

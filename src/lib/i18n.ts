@@ -148,6 +148,30 @@ export const translations = {
     en: "Aya's team will reach out shortly to confirm your payment and shipping.",
   },
   "checkout.backHome": { ar: "العودة للرئيسية", en: "Back to Home" },
+
+  "contact.eyebrow": { ar: "تواصلي معنا", en: "Get in Touch" },
+  "contact.title": { ar: "إحنا هنا لأي سؤال", en: "We're here for anything you need" },
+  "contact.sub": {
+    ar: "سواء عندك سؤال عن طلبك أو حابة تستفسري عن قطعة معينة، تقدري توصليلنا بأي طريقة تريحك.",
+    en: "Whether it's about an order or a question on a specific piece, reach us however's easiest for you.",
+  },
+  "contact.phoneLabel": { ar: "اتصلي بينا", en: "Call Us" },
+  "contact.emailLabel": { ar: "راسلينا", en: "Email Us" },
+  "contact.locationLabel": { ar: "موقعنا", en: "Find Us" },
+
+  "home.shopTeaserEyebrow": { ar: "أحدث القطع", en: "Latest Pieces" },
+  "home.shopTeaserTitle": { ar: "لمحة من المتجر", en: "A peek into the shop" },
+  "home.shopTeaserCta": { ar: "تصفحي المتجر كامل", en: "Browse the full shop" },
+
+  "home.aboutTeaserCta": { ar: "اعرفي قصتنا", en: "Read our story" },
+
+  "home.customTeaserEyebrow": { ar: "طلب خاص", en: "Custom Order" },
+  "home.customTeaserTitle": { ar: "عايزة قطعة تشبهك بالظبط؟", en: "Want something made just for you?" },
+  "home.customTeaserBody": {
+    ar: "ارفعي صورة للقطعة اللي في بالك، واحنا هنعملهالك بنفس الشكل أو بلمستنا الخاصة.",
+    en: "Upload a photo of the piece you have in mind, and we'll crochet it true to the picture — or with our own signature twist.",
+  },
+  "home.customTeaserCta": { ar: "اطلبي تصميم خاص", en: "Start a custom order" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

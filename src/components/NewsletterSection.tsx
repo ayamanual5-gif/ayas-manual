@@ -17,7 +17,7 @@ export default function NewsletterSection() {
   }
 
   return (
-    <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
       <div className="card p-8 sm:p-10 grid sm:grid-cols-2 gap-6 items-center">
         <div>
           <h3 className="font-display text-2xl sm:text-3xl" style={{ color: "var(--teal)" }}>

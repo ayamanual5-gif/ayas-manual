@@ -73,7 +73,7 @@ export default function CustomOrderSection({ categories }: { categories: Categor
   }
 
   return (
-    <section id="custom" className="py-16 sm:py-20" style={{ background: "var(--beige-100)" }}>
+    <section className="py-16 sm:py-20" style={{ background: "var(--beige-100)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="max-w-xl mb-10">
           <span className="eyebrow" style={{ color: "var(--rose)" }}>

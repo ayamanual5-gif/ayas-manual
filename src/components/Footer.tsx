@@ -22,9 +22,10 @@ export default function Footer() {
         <div>
           <p className="font-semibold opacity-90">{t("footer.linksTitle")}</p>
           <div className="mt-3 flex flex-col gap-2 opacity-80">
-            <Link href="/#shop">{t("nav.shop")}</Link>
-            <Link href="/#custom">{t("nav.custom")}</Link>
-            <Link href="/#about">{t("nav.about")}</Link>
+            <Link href="/shop">{t("nav.shop")}</Link>
+            <Link href="/custom-order">{t("nav.custom")}</Link>
+            <Link href="/about">{t("nav.about")}</Link>
+            <Link href="/contact">{t("nav.contact")}</Link>
           </div>
         </div>
         <div>

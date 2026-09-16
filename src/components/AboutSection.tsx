@@ -6,7 +6,7 @@ export default function AboutSection() {
   const { t } = useLang();
 
   return (
-    <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 grid lg:grid-cols-2 gap-10 items-center">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 grid lg:grid-cols-2 gap-10 items-center">
       <div className="order-2 lg:order-1">
         <span className="eyebrow" style={{ color: "var(--rose)" }}>
           {t("about.eyebrow")}

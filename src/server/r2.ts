@@ -58,3 +58,8 @@ export async function deleteImageFromR2(url: string | null | undefined): Promise
     // ignore — cleanup failing should never block the API response
   }
 }
+
+/** Best-effort delete of several images in parallel (e.g. all photos of a removed product). */
+export async function deleteImagesFromR2(urls: (string | null | undefined)[]): Promise<void> {
+  await Promise.all(urls.map((url) => deleteImageFromR2(url)));
+}

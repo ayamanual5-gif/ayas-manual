@@ -29,7 +29,7 @@ export const POST = withAdmin(async (request) => {
   const tint = formData.get("tint");
   const price = formData.get("price");
   const isNew = formData.get("isNew");
-  const image = formData.get("image");
+  const imageFiles = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
 
   const numericPrice = Number(price);
 
@@ -49,6 +49,8 @@ export const POST = withAdmin(async (request) => {
     return NextResponse.json({ error: "Missing or invalid product fields" }, { status: 400 });
   }
 
+  const images = await Promise.all(imageFiles.map((file) => uploadFileToR2(file)));
+
   const product: Product = {
     id: Date.now(),
     category: category.trim(),
@@ -65,7 +67,7 @@ export const POST = withAdmin(async (request) => {
       ar: typeof descAr === "string" ? descAr.trim() : "",
       en: typeof descEn === "string" ? descEn.trim() : "",
     },
-    image: image instanceof File && image.size > 0 ? await uploadFileToR2(image) : null,
+    images,
   };
 
   const saved = await productService.create(product);

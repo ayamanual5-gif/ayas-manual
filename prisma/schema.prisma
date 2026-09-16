@@ -18,7 +18,8 @@ model Product {
   name     Json
   tag      Json
   desc     Json
-  image    String?
+  // string[] of R2 URLs — first entry is the cover photo shown in listings.
+  images   Json    @default("[]")
 }
 
 model Category {

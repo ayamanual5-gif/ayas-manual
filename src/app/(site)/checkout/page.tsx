@@ -104,7 +104,7 @@ export default function CheckoutPage() {
         <p className="mt-3" style={{ color: "var(--ink-soft)" }}>
           {t("checkout.emptyMsg")}
         </p>
-        <Link href="/#shop" className="btn btn-primary mt-8 px-7 py-3.5 inline-flex">
+        <Link href="/shop" className="btn btn-primary mt-8 px-7 py-3.5 inline-flex">
           {t("cart.continueShopping")}
         </Link>
       </section>

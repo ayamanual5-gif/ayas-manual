@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useLang } from "@/context/LangContext";
 import CategoryTabs from "./CategoryTabs";
 import ProductCard from "./ProductCard";
-import ProductModal from "./ProductModal";
 import type { Category, Product } from "@/lib/types";
 
 export default function ShopSection({
@@ -18,7 +17,6 @@ export default function ShopSection({
 }) {
   const { t } = useLang();
   const [activeCategory, setActiveCategory] = useState("all");
-  const [viewedProduct, setViewedProduct] = useState<Product | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -29,7 +27,7 @@ export default function ShopSection({
   );
 
   return (
-    <section id="shop" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
       <div className="max-w-xl">
         <span className="eyebrow" style={{ color: "var(--rose)" }}>
           {t("shop.eyebrow")}
@@ -57,14 +55,12 @@ export default function ShopSection({
           ) : (
             <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} onView={setViewedProduct} />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}
         </>
       )}
-
-      <ProductModal product={viewedProduct} onClose={() => setViewedProduct(null)} />
     </section>
   );
 }
