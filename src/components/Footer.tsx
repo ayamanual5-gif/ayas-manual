@@ -18,9 +18,7 @@ const emptySettings: Settings = {
   instapayHandle: "",
   vodafoneCashNumber: "",
   whatsappNumber: "",
-  contactPhone: "",
   contactEmail: "",
-  contactAddress: "",
   socialInstagram: "",
   socialTiktok: "",
 };
@@ -70,9 +68,8 @@ export default function Footer() {
         <div>
           <p className="font-semibold opacity-90">{t("footer.contactTitle")}</p>
           <div className="mt-3 flex flex-col gap-2 opacity-80">
-            <span>{settings.contactPhone || FALLBACK_PHONE}</span>
+            <span dir="ltr">{settings.whatsappNumber || FALLBACK_PHONE}</span>
             <span>{settings.contactEmail || FALLBACK_EMAIL}</span>
-            <span>{settings.contactAddress || t("footer.location")}</span>
           </div>
         </div>
         {socials.length > 0 && (
@@ -99,14 +96,10 @@ export default function Footer() {
         )}
       </Reveal>
       <div
-        className="border-t py-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center text-xs opacity-70"
+        className="border-t py-5 text-center text-xs opacity-70"
         style={{ borderColor: "rgba(245,235,215,.15)" }}
       >
         <span>{t("footer.rights")}</span>
-        <span className="hidden sm:inline opacity-50">•</span>
-        <Link href="/admin/login" className="underline underline-offset-2 hover:opacity-100">
-          تسجيل دخول الأدمين
-        </Link>
       </div>
     </footer>
   );

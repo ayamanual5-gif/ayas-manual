@@ -84,11 +84,10 @@ model Settings {
   id                 Int    @id @default(1)
   instapayHandle     String
   vodafoneCashNumber String
-  // Used both as the order-confirmation "contact us" number and on the Contact page.
+  // Used as the order-confirmation "contact us" number, and shown on the
+  // Contact page and in the footer.
   whatsappNumber     String @default("")
-  contactPhone       String @default("")
   contactEmail       String @default("")
-  contactAddress     String @default("")
   socialInstagram    String @default("")
   socialTiktok       String @default("")
 }

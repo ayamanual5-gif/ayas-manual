@@ -10,9 +10,7 @@ const emptySettings: Settings = {
   instapayHandle: "",
   vodafoneCashNumber: "",
   whatsappNumber: "",
-  contactPhone: "",
   contactEmail: "",
-  contactAddress: "",
   socialInstagram: "",
   socialTiktok: "",
 };
@@ -112,28 +110,12 @@ export default function AdminSettingsPage() {
               />
             </div>
             <div className="field">
-              <label>رقم الهاتف</label>
-              <input
-                value={form.contactPhone}
-                onChange={(e) => updateField("contactPhone", e.target.value)}
-                placeholder="+20 100 123 4567"
-              />
-            </div>
-            <div className="field">
               <label>البريد الإلكتروني</label>
               <input
                 type="email"
                 value={form.contactEmail}
                 onChange={(e) => updateField("contactEmail", e.target.value)}
                 placeholder="hello@ayasmanual.com"
-              />
-            </div>
-            <div className="field">
-              <label>العنوان</label>
-              <input
-                value={form.contactAddress}
-                onChange={(e) => updateField("contactAddress", e.target.value)}
-                placeholder="القاهرة، مصر"
               />
             </div>
           </div>

@@ -7,9 +7,7 @@ const defaults: Settings = {
   instapayHandle: "ayasmanual@instapay",
   vodafoneCashNumber: "010 0123 4567",
   whatsappNumber: "",
-  contactPhone: "",
   contactEmail: "",
-  contactAddress: "",
   socialInstagram: "",
   socialTiktok: "",
 };
@@ -18,9 +16,7 @@ function toSettings(row: {
   instapayHandle: string;
   vodafoneCashNumber: string;
   whatsappNumber: string;
-  contactPhone: string;
   contactEmail: string;
-  contactAddress: string;
   socialInstagram: string;
   socialTiktok: string;
 }): Settings {
@@ -28,9 +24,7 @@ function toSettings(row: {
     instapayHandle: row.instapayHandle,
     vodafoneCashNumber: row.vodafoneCashNumber,
     whatsappNumber: row.whatsappNumber,
-    contactPhone: row.contactPhone,
     contactEmail: row.contactEmail,
-    contactAddress: row.contactAddress,
     socialInstagram: row.socialInstagram,
     socialTiktok: row.socialTiktok,
   };

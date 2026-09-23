@@ -81,9 +81,7 @@ export interface Settings {
   instapayHandle: string;
   vodafoneCashNumber: string;
   whatsappNumber: string;
-  contactPhone: string;
   contactEmail: string;
-  contactAddress: string;
   socialInstagram: string;
   socialTiktok: string;
 }

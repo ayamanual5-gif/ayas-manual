@@ -28,9 +28,7 @@ export const PUT = withAdmin(async (request) => {
     instapayHandle: instapayHandle.trim(),
     vodafoneCashNumber: vodafoneCashNumber.trim(),
     whatsappNumber: str(body?.whatsappNumber),
-    contactPhone: str(body?.contactPhone),
     contactEmail: str(body?.contactEmail),
-    contactAddress: str(body?.contactAddress),
     socialInstagram: str(body?.socialInstagram),
     socialTiktok: str(body?.socialTiktok),
   });
