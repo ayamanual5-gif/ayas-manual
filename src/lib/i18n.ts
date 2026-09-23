@@ -18,6 +18,7 @@ export const translations = {
   "hero.badge1": { ar: "🧶 يدوي بالكامل", en: "🧶 Fully Handmade" },
   "hero.badge2": { ar: "🌿 خيوط طبيعية", en: "🌿 Natural Yarns" },
   "hero.badge3": { ar: "📦 صناعة مصرية", en: "📦 Made in Egypt" },
+  "hero.carouselView": { ar: "عرض المنتج", en: "View Product" },
 
   "value1": { ar: "كل قطعة بتتعمل خصيصاً لطلبك", en: "Every piece crocheted to order" },
   "value2": { ar: "ألوان مخصصة حسب طلبك", en: "Custom colorways on request" },

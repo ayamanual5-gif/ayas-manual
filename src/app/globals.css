@@ -333,46 +333,108 @@ textarea {
   grid-area: badges;
 }
 
-/* Hero handmade showcase — a single rounded frame where a "thread" outline
-   draws itself, then the real product photo fades in inside it. */
-.hero-visual {
+/* Hero product carousel — center-focused, peeking neighbors */
+.carousel-wrapper {
   position: relative;
   width: 100%;
-  max-width: 320px;
+  max-width: 420px;
   margin-inline: auto;
-}
-@media (min-width: 1024px) {
-  .hero-visual {
-    max-width: 380px;
-  }
-}
-.hero-visual-backdrop {
-  position: absolute;
-  inset: 4%;
+  background: var(--beige);
   border-radius: 28px;
-  background: var(--beige-100);
-  border: 1px solid var(--beige-200);
+  padding: 1.25rem 0;
 }
-.hero-visual-frame {
+.carousel-viewport {
   position: relative;
-  display: block;
   width: 100%;
-  aspect-ratio: 1;
-  cursor: pointer;
+  height: clamp(300px, 62vw, 380px);
+  overflow: hidden;
 }
-.hero-thread-svg {
+.carousel-drag-surface {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  touch-action: pan-y;
 }
-.hero-photo {
+.carousel-card {
   position: absolute;
-  inset: 12%;
-  border-radius: 22%;
+  top: 0;
+  height: 100%;
+  cursor: grab;
+}
+.carousel-card-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--beige-100);
+  border: 1px solid var(--beige-200);
+  border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 16px 36px -16px rgba(0, 80, 85, 0.4);
-  transform-style: preserve-3d;
+  box-shadow: 0 18px 34px -20px rgba(43, 35, 25, 0.3);
+}
+.carousel-card-image {
+  display: block;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+.carousel-card-info {
+  padding: 0.85rem 1rem 1rem;
+  text-align: center;
+}
+.carousel-card-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.carousel-card-price {
+  margin-top: 0.25rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--teal);
+}
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  width: 38px;
+  height: 38px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--beige-100);
+  border: 1.5px solid var(--beige-200);
+  color: var(--teal);
+  box-shadow: 0 8px 20px -8px rgba(0, 80, 85, 0.4);
+  z-index: 5;
+}
+.carousel-arrow-prev {
+  inset-inline-start: -6px;
+}
+.carousel-arrow-next {
+  inset-inline-end: -6px;
+}
+.carousel-dots {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+.carousel-knot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  color: var(--beige-200);
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+.carousel-knot.active {
+  color: var(--teal);
+  transform: scale(1.15);
 }
 .gallery-arrow {
   position: absolute;

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { cssVars } from "@/lib/cssVars";
-import HandmadeShowcase from "./HandmadeShowcase";
+import ProductCarousel from "./ProductCarousel";
 import { EASE, staggerContainer, fadeUp } from "./motion/variants";
 import type { Product } from "@/lib/types";
 
@@ -57,7 +57,7 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.2 }}
         >
-          <HandmadeShowcase products={products} />
+          <ProductCarousel products={products} />
         </motion.div>
 
         <motion.div variants={fadeUp} className="hero-area-ctas mt-8 flex flex-wrap gap-3">
