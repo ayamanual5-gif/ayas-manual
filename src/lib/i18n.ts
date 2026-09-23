@@ -98,7 +98,7 @@ export const translations = {
 
   "product.add": { ar: "أضيفي للسلة", en: "Add to Cart" },
   "product.view": { ar: "التفاصيل", en: "View Details" },
-  "product.new": { ar: "جديد", en: "New" },
+  "product.new": { ar: "الأكثر مبيعاً", en: "Best Seller" },
 
   "toast.added": { ar: "تمت الإضافة للسلة 🧶", en: "Added to cart 🧶" },
   "toast.news": { ar: "تم الاشتراك، شكراً ليكي!", en: "Subscribed — thank you!" },
@@ -159,7 +159,7 @@ export const translations = {
   "contact.emailLabel": { ar: "راسلينا", en: "Email Us" },
   "contact.notSet": { ar: "لسه متضافش", en: "Not set yet" },
 
-  "home.shopTeaserEyebrow": { ar: "أحدث القطع", en: "Latest Pieces" },
+  "home.shopTeaserEyebrow": { ar: "الأكثر مبيعاً", en: "Best Sellers" },
   "home.shopTeaserTitle": { ar: "لمحة من المتجر", en: "A peek into the shop" },
   "home.shopTeaserCta": { ar: "تصفحي المتجر كامل", en: "Browse the full shop" },
   "home.shopMoreTitle": { ar: "دي مجرد البداية", en: "This is just the beginning" },

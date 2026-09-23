@@ -315,7 +315,7 @@ export default function ProductFormModal({
               onChange={(e) => updateField("isNew", e.target.checked)}
               className="w-4 h-4"
             />
-            وسم المنتج بـ &quot;جديد&quot;
+            وضع المنتج في قائمة الأكثر مبيعاً
           </label>
 
           <label className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--ink-soft)" }}>

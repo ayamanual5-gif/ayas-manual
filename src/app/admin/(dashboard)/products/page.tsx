@@ -113,7 +113,7 @@ export default function AdminProductsPage() {
                 <th className="p-3 text-start">الاسم</th>
                 <th className="p-3 text-start">الفئة</th>
                 <th className="p-3 text-start">السعر</th>
-                <th className="p-3 text-start">جديد؟</th>
+                <th className="p-3 text-start">الأكثر مبيعاً؟</th>
                 <th className="p-3 text-start">إجراءات</th>
               </tr>
             </thead>
