@@ -7,6 +7,7 @@ import { useCart } from "@/context/CartContext";
 import ProductVisual from "./ProductVisual";
 import { EASE } from "./motion/variants";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import { getEffectivePrice, hasDiscount } from "@/lib/pricing";
 
 export default function CartDrawer() {
   const { lang, t } = useLang();
@@ -74,8 +75,15 @@ export default function CartDrawer() {
                       <ProductVisual product={product} className="w-16 h-16 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold truncate">{product.name[lang]}</p>
-                        <p className="text-xs" style={{ color: "var(--ink-soft)" }}>
-                          {product.price} {t("currency")}
+                        <p className="text-xs flex items-center gap-1.5">
+                          {hasDiscount(product) && (
+                            <span className="line-through" style={{ color: "var(--ink-soft)" }}>
+                              {product.price} {t("currency")}
+                            </span>
+                          )}
+                          <span style={{ color: hasDiscount(product) ? "var(--rose)" : "var(--ink-soft)" }}>
+                            {getEffectivePrice(product)} {t("currency")}
+                          </span>
                         </p>
                         <div className="mt-1.5 flex items-center gap-1">
                           <motion.button

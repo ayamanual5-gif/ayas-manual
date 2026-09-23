@@ -8,6 +8,16 @@ function toBool(value: unknown): boolean {
   return value === true || value === "true" || value === "1" || value === "on";
 }
 
+/** Returns null for empty/"0", the parsed 1-100 integer otherwise, or `undefined` if invalid. */
+function parseDiscountPercent(value: FormDataEntryValue | null): number | null | undefined {
+  if (value === null || value === "") return null;
+  const n = Number(value);
+  if (!Number.isInteger(n)) return undefined;
+  if (n <= 0) return null;
+  if (n > 100) return undefined;
+  return n;
+}
+
 export const GET = withAdmin(async () => {
   const products = await productService.getAll();
   return NextResponse.json(products);
@@ -25,11 +35,13 @@ export const POST = withAdmin(async (request) => {
   const category = formData.get("category");
   const icon = formData.get("icon");
   const price = formData.get("price");
+  const discountPercentRaw = formData.get("discountPercent");
   const isNew = formData.get("isNew");
   const showInHero = formData.get("showInHero");
   const imageFiles = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
 
   const numericPrice = Number(price);
+  const discountPercent = parseDiscountPercent(discountPercentRaw);
 
   if (
     typeof nameAr !== "string" ||
@@ -41,7 +53,8 @@ export const POST = withAdmin(async (request) => {
     typeof icon !== "string" ||
     !icon.trim() ||
     Number.isNaN(numericPrice) ||
-    numericPrice <= 0
+    numericPrice <= 0 ||
+    discountPercent === undefined
   ) {
     return NextResponse.json({ error: "Missing or invalid product fields" }, { status: 400 });
   }
@@ -56,6 +69,7 @@ export const POST = withAdmin(async (request) => {
     icon: icon.trim(),
     tint: "teal",
     price: numericPrice,
+    discountPercent,
     isNew: toBool(isNew),
     showInHero: toBool(showInHero),
     name: { ar: nameAr.trim(), en: nameEn.trim() },

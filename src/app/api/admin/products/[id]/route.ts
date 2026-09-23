@@ -8,6 +8,16 @@ function toBool(value: unknown): boolean {
   return value === true || value === "true" || value === "1" || value === "on";
 }
 
+/** Returns null for empty/"0", the parsed 1-100 integer otherwise, or `undefined` if invalid. */
+function parseDiscountPercent(value: FormDataEntryValue | null): number | null | undefined {
+  if (value === null || value === "") return null;
+  const n = Number(value);
+  if (!Number.isInteger(n)) return undefined;
+  if (n <= 0) return null;
+  if (n > 100) return undefined;
+  return n;
+}
+
 export const PUT = withAdmin(async (request, context) => {
   const { id: idParam } = await context.params;
   const id = Number(idParam);
@@ -27,6 +37,7 @@ export const PUT = withAdmin(async (request, context) => {
   const category = formData.get("category");
   const icon = formData.get("icon");
   const price = formData.get("price");
+  const discountPercentRaw = formData.get("discountPercent");
   const isNew = formData.get("isNew");
   const showInHero = formData.get("showInHero");
   const newImageFiles = formData
@@ -55,6 +66,13 @@ export const PUT = withAdmin(async (request, context) => {
       return NextResponse.json({ error: "Invalid price" }, { status: 400 });
     }
     patch.price = numericPrice;
+  }
+  if (discountPercentRaw !== null) {
+    const discountPercent = parseDiscountPercent(discountPercentRaw);
+    if (discountPercent === undefined) {
+      return NextResponse.json({ error: "Invalid discount percent" }, { status: 400 });
+    }
+    patch.discountPercent = discountPercent;
   }
   if (isNew !== null) patch.isNew = toBool(isNew);
   if (showInHero !== null) patch.showInHero = toBool(showInHero);

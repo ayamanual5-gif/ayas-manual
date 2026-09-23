@@ -31,6 +31,8 @@ model Product {
   // a fallback if a product somehow ends up with zero images.
   tint       String   @default("teal")
   price      Int
+  // Percentage off `price` (0-100). Null/0 means no discount.
+  discountPercent Int?
   isNew      Boolean  @default(false)
   // Featured in the homepage Hero carousel when true.
   showInHero Boolean  @default(false)

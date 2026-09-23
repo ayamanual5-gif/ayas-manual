@@ -7,6 +7,7 @@ import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { resolveImageUrl } from "@/lib/api";
 import { ProductIcon, tintBgVar, tintColorVar } from "@/lib/icons";
+import { getEffectivePrice, hasDiscount } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
 import { EASE, staggerContainer, fadeUp } from "./motion/variants";
 
@@ -23,6 +24,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
   const images = product.images ?? [];
   const hasImages = images.length > 0;
+  const discounted = hasDiscount(product);
 
   function goTo(index: number) {
     if (images.length === 0) return;
@@ -181,15 +183,18 @@ export default function ProductDetailClient({ product }: { product: Product }) {
       </motion.div>
 
       <div>
-        {product.isNew && (
-          <motion.span
-            variants={fadeUp}
-            className="chip !border-0 inline-block mb-3"
-            style={{ background: "var(--rose)", color: "#fff" }}
-          >
-            {t("product.new")}
-          </motion.span>
-        )}
+        <motion.div variants={fadeUp} className="flex items-center gap-2 mb-3">
+          {product.isNew && (
+            <span className="chip !border-0 inline-block" style={{ background: "var(--rose)", color: "#fff" }}>
+              {t("product.new")}
+            </span>
+          )}
+          {discounted && (
+            <span className="chip !border-0 inline-block font-bold" style={{ background: "var(--olive)", color: "#fff" }}>
+              -{product.discountPercent}%
+            </span>
+          )}
+        </motion.div>
         <motion.h1 variants={fadeUp} className="font-display text-3xl sm:text-4xl" style={{ color: "var(--teal)" }}>
           {product.name[lang]}
         </motion.h1>
@@ -204,10 +209,16 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, ease: EASE, delay: 0.15 }}
-          className="mt-6 text-2xl font-bold"
-          style={{ color: "var(--teal)" }}
+          className="mt-6 flex items-center gap-3"
         >
-          {product.price} {t("currency")}
+          {discounted && (
+            <span className="text-lg line-through" style={{ color: "var(--ink-soft)" }}>
+              {product.price} {t("currency")}
+            </span>
+          )}
+          <span className="text-2xl font-bold" style={{ color: discounted ? "var(--rose)" : "var(--teal)" }}>
+            {getEffectivePrice(product)} {t("currency")}
+          </span>
         </motion.div>
         <motion.button
           ref={ctaRef}
@@ -260,8 +271,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))",
             }}
           >
-            <div className="font-bold text-lg shrink-0" style={{ color: "var(--teal)" }}>
-              {product.price} {t("currency")}
+            <div className="font-bold text-lg shrink-0" style={{ color: discounted ? "var(--rose)" : "var(--teal)" }}>
+              {getEffectivePrice(product)} {t("currency")}
             </div>
             <motion.button whileTap={{ scale: 0.96 }} className="btn btn-primary flex-1 py-3" onClick={handleAdd}>
               {added ? t("toast.added") : t("product.add")}

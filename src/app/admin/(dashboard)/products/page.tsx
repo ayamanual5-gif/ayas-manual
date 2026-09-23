@@ -7,6 +7,7 @@ import ProductVisual from "@/components/ProductVisual";
 import ProductFormModal from "@/components/admin/ProductFormModal";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useToast } from "@/context/ToastContext";
+import { getEffectivePrice, hasDiscount } from "@/lib/pricing";
 import type { Category, Product } from "@/lib/types";
 
 export default function AdminProductsPage() {
@@ -124,7 +125,21 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="p-3 font-semibold">{product.name.ar}</td>
                   <td className="p-3">{categoryLabel(product.category)}</td>
-                  <td className="p-3">{product.price} ج.م</td>
+                  <td className="p-3">
+                    {hasDiscount(product) ? (
+                      <div>
+                        <span className="line-through text-xs" style={{ color: "var(--ink-soft)" }}>
+                          {product.price} ج.م
+                        </span>
+                        <div className="font-bold" style={{ color: "var(--rose)" }}>
+                          {getEffectivePrice(product)} ج.م
+                          <span className="ms-1 text-xs font-semibold">(-{product.discountPercent}%)</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span>{product.price} ج.م</span>
+                    )}
+                  </td>
                   <td className="p-3">{product.isNew ? "نعم" : "-"}</td>
                   <td className="p-3">
                     <div className="flex gap-2">

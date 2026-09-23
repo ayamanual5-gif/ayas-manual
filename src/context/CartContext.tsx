@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { getEffectivePrice } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
 
 export interface CartItem {
@@ -81,7 +82,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const count = useMemo(() => items.reduce((sum, i) => sum + i.qty, 0), [items]);
   const subtotal = useMemo(
-    () => items.reduce((sum, i) => sum + i.qty * i.product.price, 0),
+    () => items.reduce((sum, i) => sum + i.qty * getEffectivePrice(i.product), 0),
     [items]
   );
 

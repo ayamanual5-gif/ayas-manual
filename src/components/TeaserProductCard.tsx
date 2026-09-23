@@ -6,6 +6,7 @@ import { useLang } from "@/context/LangContext";
 import ProductVisual from "./ProductVisual";
 import { staggerItem } from "./motion/Stagger";
 import { EASE } from "./motion/variants";
+import { getEffectivePrice, hasDiscount } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
 
 /**
@@ -16,6 +17,7 @@ import type { Product } from "@/lib/types";
  */
 export default function TeaserProductCard({ product }: { product: Product }) {
   const { lang, t } = useLang();
+  const discounted = hasDiscount(product);
 
   return (
     <motion.div variants={staggerItem}>
@@ -30,6 +32,14 @@ export default function TeaserProductCard({ product }: { product: Product }) {
               style={{ background: "var(--rose)", color: "#fff" }}
             >
               {t("product.new")}
+            </span>
+          )}
+          {discounted && (
+            <span
+              className="absolute top-2 end-2 chip !border-0 !py-1 !px-2.5 text-[10px] font-bold"
+              style={{ background: "var(--olive)", color: "#fff" }}
+            >
+              -{product.discountPercent}%
             </span>
           )}
           <motion.span
@@ -48,8 +58,15 @@ export default function TeaserProductCard({ product }: { product: Product }) {
           <h3 className="font-semibold text-sm sm:text-base leading-snug group-hover:text-[var(--rose)] transition-colors">
             {product.name[lang]}
           </h3>
-          <div className="mt-1 font-bold text-sm sm:text-base" style={{ color: "var(--teal)" }}>
-            {product.price} {t("currency")}
+          <div className="mt-1 flex items-center gap-1.5">
+            {discounted && (
+              <span className="text-xs line-through" style={{ color: "var(--ink-soft)" }}>
+                {product.price} {t("currency")}
+              </span>
+            )}
+            <span className="font-bold text-sm sm:text-base" style={{ color: discounted ? "var(--rose)" : "var(--teal)" }}>
+              {getEffectivePrice(product)} {t("currency")}
+            </span>
           </div>
         </motion.div>
       </Link>

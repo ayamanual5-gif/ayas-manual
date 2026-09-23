@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { fetchSettings, submitOrder } from "@/lib/api";
 import ProductVisual from "@/components/ProductVisual";
 import { EASE } from "@/components/motion/variants";
+import { getEffectivePrice, hasDiscount } from "@/lib/pricing";
 import type { OrderItem } from "@/lib/types";
 
 type PaymentMethod = "instapay" | "vodafone_cash";
@@ -63,7 +64,7 @@ export default function CheckoutPage() {
     const orderItems: OrderItem[] = items.map(({ product, qty }) => ({
       productId: product.id,
       name: product.name[lang],
-      price: product.price,
+      price: getEffectivePrice(product),
       qty,
     }));
 
@@ -176,20 +177,27 @@ export default function CheckoutPage() {
               {t("checkout.itemsTitle")}
             </h2>
             <div className="mt-4 space-y-4">
-              {items.map(({ product, qty }) => (
-                <div key={product.id} className="flex gap-3 items-center">
-                  <ProductVisual product={product} className="w-14 h-14 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate">{product.name[lang]}</p>
-                    <p className="text-xs" style={{ color: "var(--ink-soft)" }}>
-                      {qty} × {product.price} {t("currency")}
-                    </p>
+              {items.map(({ product, qty }) => {
+                const unitPrice = getEffectivePrice(product);
+                return (
+                  <div key={product.id} className="flex gap-3 items-center">
+                    <ProductVisual product={product} className="w-14 h-14 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{product.name[lang]}</p>
+                      <p className="text-xs flex items-center gap-1.5" style={{ color: "var(--ink-soft)" }}>
+                        <span>{qty} ×</span>
+                        {hasDiscount(product) && <span className="line-through">{product.price}</span>}
+                        <span>
+                          {unitPrice} {t("currency")}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="text-sm font-bold" style={{ color: "var(--teal)" }}>
+                      {qty * unitPrice} {t("currency")}
+                    </div>
                   </div>
-                  <div className="text-sm font-bold" style={{ color: "var(--teal)" }}>
-                    {qty * product.price} {t("currency")}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="mt-5 pt-4 border-t flex items-center justify-between font-bold" style={{ borderColor: "var(--beige-200)" }}>
               <span>{t("cart.subtotal")}</span>

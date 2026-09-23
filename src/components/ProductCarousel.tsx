@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ProductVisual from "./ProductVisual";
 import { useLang } from "@/context/LangContext";
+import { getEffectivePrice, hasDiscount } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
 import { EASE } from "./motion/variants";
 
@@ -219,8 +220,15 @@ function CarouselCard({
         <div className="carousel-card-info">
           <h3 className="carousel-card-name">{product.name[lang]}</h3>
           {isActive && (
-            <div className="carousel-card-price">
-              {product.price} {t("currency")}
+            <div className="carousel-card-price flex items-center justify-center gap-1.5">
+              {hasDiscount(product) && (
+                <span className="text-xs line-through font-normal" style={{ color: "var(--ink-soft)" }}>
+                  {product.price} {t("currency")}
+                </span>
+              )}
+              <span style={{ color: hasDiscount(product) ? "var(--rose)" : "var(--teal)" }}>
+                {getEffectivePrice(product)} {t("currency")}
+              </span>
             </div>
           )}
           {isActive && (

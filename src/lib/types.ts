@@ -11,6 +11,8 @@ export interface Product {
   icon: string;
   tint: ProductTint;
   price: number;
+  /** Percentage off `price` (0-100). Null/0 means no discount. */
+  discountPercent: number | null;
   isNew: boolean;
   showInHero: boolean;
   name: LocalizedText;

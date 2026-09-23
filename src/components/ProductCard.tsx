@@ -8,12 +8,14 @@ import { useToast } from "@/context/ToastContext";
 import ProductVisual from "./ProductVisual";
 import { staggerItem } from "./motion/Stagger";
 import { EASE } from "./motion/variants";
+import { getEffectivePrice, hasDiscount } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { lang, t } = useLang();
   const { addToCart } = useCart();
   const { showToast } = useToast();
+  const discounted = hasDiscount(product);
 
   const handleAdd = () => {
     addToCart(product);
@@ -39,6 +41,14 @@ export default function ProductCard({ product }: { product: Product }) {
             {t("product.new")}
           </span>
         )}
+        {discounted && (
+          <span
+            className="absolute top-2 chip !border-0 !py-1 !px-2.5 text-[10px] font-bold"
+            style={{ insetInlineEnd: ".5rem", background: "var(--olive)", color: "#fff" }}
+          >
+            -{product.discountPercent}%
+          </span>
+        )}
       </Link>
       <Link href={`/shop/${product.id}`}>
         <h3 className="mt-4 font-semibold leading-snug hover:text-[var(--rose)] transition-colors">
@@ -48,8 +58,15 @@ export default function ProductCard({ product }: { product: Product }) {
       <p className="mt-1 text-xs" style={{ color: "var(--ink-soft)" }}>
         {product.tag[lang]}
       </p>
-      <div className="mt-3 font-bold" style={{ color: "var(--teal)" }}>
-        {product.price} {t("currency")}
+      <div className="mt-3 flex items-center gap-2">
+        {discounted && (
+          <span className="text-xs line-through" style={{ color: "var(--ink-soft)" }}>
+            {product.price} {t("currency")}
+          </span>
+        )}
+        <span className="font-bold" style={{ color: discounted ? "var(--rose)" : "var(--teal)" }}>
+          {getEffectivePrice(product)} {t("currency")}
+        </span>
       </div>
       <div className="mt-4 flex gap-2">
         <Link href={`/shop/${product.id}`} className="btn btn-outline flex-1 !py-2 text-xs">

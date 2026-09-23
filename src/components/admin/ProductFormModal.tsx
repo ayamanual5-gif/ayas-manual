@@ -24,6 +24,7 @@ interface FormState {
   category: string;
   icon: string;
   price: string;
+  discountPercent: string;
   isNew: boolean;
   showInHero: boolean;
 }
@@ -46,6 +47,7 @@ function emptyForm(defaultCategory: string): FormState {
     category: defaultCategory,
     icon: "bag",
     price: "",
+    discountPercent: "",
     isNew: false,
     showInHero: false,
   };
@@ -62,6 +64,7 @@ function fromProduct(product: Product): FormState {
     category: product.category,
     icon: product.icon,
     price: String(product.price),
+    discountPercent: product.discountPercent ? String(product.discountPercent) : "",
     isNew: product.isNew,
     showInHero: product.showInHero,
   };
@@ -154,6 +157,13 @@ export default function ProductFormModal({
       setError("السعر لازم يكون رقم أكبر من صفر.");
       return;
     }
+    if (form.discountPercent) {
+      const numericDiscount = Number(form.discountPercent);
+      if (!Number.isInteger(numericDiscount) || numericDiscount <= 0 || numericDiscount > 100) {
+        setError("نسبة الخصم لازم تكون رقم صحيح من 1 لـ 100.");
+        return;
+      }
+    }
 
     setSubmitting(true);
     try {
@@ -167,6 +177,7 @@ export default function ProductFormModal({
       fd.append("category", form.category);
       fd.append("icon", form.icon);
       fd.append("price", form.price);
+      fd.append("discountPercent", form.discountPercent);
       fd.append("isNew", String(form.isNew));
       fd.append("showInHero", String(form.showInHero));
 
@@ -274,6 +285,27 @@ export default function ProductFormModal({
                 required
               />
             </div>
+          </div>
+
+          <div className="field sm:max-w-xs">
+            <label>نسبة الخصم % (اختياري)</label>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              step="1"
+              value={form.discountPercent}
+              onChange={(e) => updateField("discountPercent", e.target.value)}
+              placeholder="مثلاً 20"
+            />
+            {form.discountPercent && Number(form.price) > 0 && (
+              <p className="mt-1.5 text-xs" style={{ color: "var(--ink-soft)" }}>
+                السعر بعد الخصم:{" "}
+                <span className="font-bold" style={{ color: "var(--teal)" }}>
+                  {Math.round(Number(form.price) * (1 - Number(form.discountPercent) / 100))} ج.م
+                </span>
+              </p>
+            )}
           </div>
 
           <label className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--ink-soft)" }}>

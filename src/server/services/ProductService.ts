@@ -9,6 +9,7 @@ function toProduct(row: {
   icon: string;
   tint: string;
   price: number;
+  discountPercent: number | null;
   isNew: boolean;
   showInHero: boolean;
   name: unknown;
@@ -22,6 +23,7 @@ function toProduct(row: {
     icon: row.icon,
     tint: row.tint as ProductTint,
     price: row.price,
+    discountPercent: row.discountPercent,
     isNew: row.isNew,
     showInHero: row.showInHero,
     name: row.name as LocalizedText,
