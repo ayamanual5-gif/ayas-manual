@@ -18,10 +18,33 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAdminMe()
-      .then((res) => setEmail(res.email))
-      .catch(() => setEmail(null))
-      .finally(() => setLoading(false));
+    function check() {
+      fetchAdminMe()
+        .then((res) => setEmail(res.email))
+        .catch(() => setEmail(null))
+        .finally(() => setLoading(false));
+    }
+    check();
+
+    // The browser can restore this page from bfcache on Back/Forward
+    // navigation instead of re-mounting it — which would silently keep
+    // whatever email/loading state this component had at the moment it was
+    // navigated away from (e.g. "not logged in yet", if that's what it was
+    // before the admin logged in). Re-check on restore so login state never
+    // goes stale after Back/Forward. Also re-check on tab focus/visibility
+    // as a general safety net for the same class of stale-state issue.
+    function handlePageShow(e: PageTransitionEvent) {
+      if (e.persisted) check();
+    }
+    function handleVisibility() {
+      if (document.visibilityState === "visible") check();
+    }
+    window.addEventListener("pageshow", handlePageShow);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("pageshow", handlePageShow);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   async function login(emailInput: string, password: string) {

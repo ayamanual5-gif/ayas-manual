@@ -4,6 +4,7 @@ async function adminFetch(path: string, options: RequestInit = {}): Promise<Resp
   const isFormData = options.body instanceof FormData;
   const res = await fetch(path, {
     ...options,
+    cache: "no-store",
     headers: {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...options.headers,

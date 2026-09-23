@@ -37,11 +37,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+    function check() {
+      fetch("/api/auth/me", { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => setUser(data.user))
+        .catch(() => setUser(null))
+        .finally(() => setLoading(false));
+    }
+    check();
+
+    // Re-check when the browser restores this page from bfcache (Back/
+    // Forward) instead of re-mounting it, so login/logout state can't go
+    // stale after navigating with the browser buttons. Also re-check on tab
+    // focus/visibility as a general safety net for the same class of issue.
+    function handlePageShow(e: PageTransitionEvent) {
+      if (e.persisted) check();
+    }
+    function handleVisibility() {
+      if (document.visibilityState === "visible") check();
+    }
+    window.addEventListener("pageshow", handlePageShow);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("pageshow", handlePageShow);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   async function login(email: string, password: string) {
