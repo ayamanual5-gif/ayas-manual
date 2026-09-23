@@ -156,9 +156,8 @@ export const translations = {
     ar: "سواء عندك سؤال عن طلبك أو حابة تستفسري عن قطعة معينة، تقدري توصليلنا بأي طريقة تريحك.",
     en: "Whether it's about an order or a question on a specific piece, reach us however's easiest for you.",
   },
-  "contact.phoneLabel": { ar: "اتصلي بينا", en: "Call Us" },
   "contact.emailLabel": { ar: "راسلينا", en: "Email Us" },
-  "contact.locationLabel": { ar: "موقعنا", en: "Find Us" },
+  "contact.notSet": { ar: "لسه متضافش", en: "Not set yet" },
 
   "home.shopTeaserEyebrow": { ar: "أحدث القطع", en: "Latest Pieces" },
   "home.shopTeaserTitle": { ar: "لمحة من المتجر", en: "A peek into the shop" },
