@@ -7,22 +7,20 @@ export const translations = {
   "nav.about": { ar: "من نحن", en: "About Us" },
   "nav.contact": { ar: "تواصل معنا", en: "Contact" },
 
-  "hero.eyebrow": { ar: "صناعة يدوية 100%", en: "100% Handmade" },
   "hero.headline": { ar: "Aya's Manual — فن بيتعمل بحب، غرزة غرزة", en: "Aya's Manual — Handwoven Art with Love" },
   "hero.sub": {
     ar: "كل قطعة بنعملها بإيدينا من غرزة السلسلة الأولى، بخيوط قطن وصوف طبيعية، وتقدري تختاري الألوان اللي تعبّر عنك.",
     en: "Every piece is hand-crocheted from the very first chain stitch, using natural cotton and wool yarns — and you choose the colors that feel like you.",
   },
   "hero.cta1": { ar: "تسوقي الآن", en: "Shop Now" },
-  "hero.cta2": { ar: "اكتشفي أكثر", en: "Learn More" },
   "hero.badge1": { ar: "🧶 يدوي بالكامل", en: "🧶 Fully Handmade" },
   "hero.badge2": { ar: "🌿 خيوط طبيعية", en: "🌿 Natural Yarns" },
-  "hero.badge3": { ar: "📦 صناعة مصرية", en: "📦 Made in Egypt" },
+  "hero.badge3": { ar: "✨ أعلى جودة خامات", en: "✨ Premium Materials" },
   "hero.carouselView": { ar: "عرض المنتج", en: "View Product" },
 
   "value1": { ar: "كل قطعة بتتعمل خصيصاً لطلبك", en: "Every piece crocheted to order" },
   "value2": { ar: "ألوان مخصصة حسب طلبك", en: "Custom colorways on request" },
-  "value3": { ar: "شحن لكل محافظات مصر", en: "Shipping to every governorate" },
+  "value3": { ar: "إمكانية التنفيذ بأي لون", en: "Available in any color" },
 
   "shop.eyebrow": { ar: "تشكيلاتنا", en: "Our Collections" },
   "shop.title": { ar: "اختاري القطعة اللي تشبهك", en: "Find the piece that feels like you" },

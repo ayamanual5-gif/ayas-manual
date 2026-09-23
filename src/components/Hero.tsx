@@ -35,13 +35,9 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
         initial="hidden"
         animate="show"
       >
-        <motion.span variants={fadeUp} className="hero-area-label chip inline-block">
-          {t("hero.eyebrow")}
-        </motion.span>
-
         <motion.h1
           variants={fadeUp}
-          className="hero-area-headline font-display mt-5 text-4xl sm:text-5xl xl:text-[3.4rem] leading-[1.15]"
+          className="hero-area-headline font-display text-4xl sm:text-5xl xl:text-[3.4rem] leading-[1.15]"
           style={{ color: "var(--teal)" }}
         >
           {t("hero.headline")}
@@ -64,11 +60,6 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={{ duration: 0.18, ease: EASE }}>
             <Link href="/shop" className="btn btn-primary px-7 py-3.5">
               {t("hero.cta1")}
-            </Link>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={{ duration: 0.18, ease: EASE }}>
-            <Link href="/about" className="btn btn-outline px-7 py-3.5">
-              {t("hero.cta2")}
             </Link>
           </motion.div>
         </motion.div>

@@ -294,7 +294,6 @@ textarea {
   gap: 0;
   grid-template-columns: 1fr;
   grid-template-areas:
-    "label"
     "headline"
     "desc"
     "visual"
@@ -307,15 +306,11 @@ textarea {
     column-gap: 2.5rem;
     align-items: center;
     grid-template-areas:
-      "label visual"
       "headline visual"
       "desc visual"
       "ctas visual"
       "badges visual";
   }
-}
-.hero-area-label {
-  grid-area: label;
 }
 .hero-area-headline {
   grid-area: headline;
