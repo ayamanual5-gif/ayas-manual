@@ -14,7 +14,7 @@ const emptySettings: Settings = {
   contactEmail: "",
   contactAddress: "",
   socialInstagram: "",
-  socialPinterest: "",
+  socialTiktok: "",
 };
 
 export default function AdminSettingsPage() {
@@ -151,11 +151,11 @@ export default function AdminSettingsPage() {
               />
             </div>
             <div className="field">
-              <label>بينترست (رابط كامل)</label>
+              <label>تيك توك (رابط كامل)</label>
               <input
-                value={form.socialPinterest}
-                onChange={(e) => updateField("socialPinterest", e.target.value)}
-                placeholder="https://pinterest.com/ayasmanual"
+                value={form.socialTiktok}
+                onChange={(e) => updateField("socialTiktok", e.target.value)}
+                placeholder="https://tiktok.com/@ayasmanual"
               />
             </div>
           </div>

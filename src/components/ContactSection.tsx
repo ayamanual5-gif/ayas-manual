@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import Reveal from "./motion/Reveal";
 import { StaggerContainer, StaggerItem } from "./motion/Stagger";
+import SocialIcon from "./SocialIcon";
 import type { Settings } from "@/lib/types";
 
 const FALLBACK_PHONE = "+20 100 123 4567";
@@ -54,9 +55,13 @@ export default function ContactSection({ settings }: { settings: Settings }) {
   ];
 
   const socials = [
-    { label: "Instagram", href: settings.socialInstagram },
-    { label: "WhatsApp", href: settings.whatsappNumber ? `https://wa.me/${settings.whatsappNumber.replace(/\D/g, "")}` : "" },
-    { label: "Pinterest", href: settings.socialPinterest },
+    { label: "Instagram", platform: "instagram" as const, href: settings.socialInstagram },
+    { label: "TikTok", platform: "tiktok" as const, href: settings.socialTiktok },
+    {
+      label: "WhatsApp",
+      platform: "whatsapp" as const,
+      href: settings.whatsappNumber ? `https://wa.me/${settings.whatsappNumber.replace(/\D/g, "")}` : "",
+    },
   ].filter((s) => s.href);
 
   return (
@@ -124,9 +129,7 @@ export default function ContactSection({ settings }: { settings: Settings }) {
                 style={{ background: "var(--beige-100)", border: "1px solid var(--beige-200)", color: "var(--teal)" }}
                 aria-label={s.label}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <circle cx="12" cy="12" r="9" />
-                </svg>
+                <SocialIcon platform={s.platform} />
               </motion.a>
             ))}
           </div>

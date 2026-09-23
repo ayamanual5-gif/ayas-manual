@@ -85,7 +85,7 @@ export interface Settings {
   contactEmail: string;
   contactAddress: string;
   socialInstagram: string;
-  socialPinterest: string;
+  socialTiktok: string;
 }
 
 export type Lang = "ar" | "en";

@@ -32,7 +32,7 @@ export const PUT = withAdmin(async (request) => {
     contactEmail: str(body?.contactEmail),
     contactAddress: str(body?.contactAddress),
     socialInstagram: str(body?.socialInstagram),
-    socialPinterest: str(body?.socialPinterest),
+    socialTiktok: str(body?.socialTiktok),
   });
   return NextResponse.json(updated);
 });

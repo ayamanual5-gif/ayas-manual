@@ -90,5 +90,5 @@ model Settings {
   contactEmail       String @default("")
   contactAddress     String @default("")
   socialInstagram    String @default("")
-  socialPinterest    String @default("")
+  socialTiktok       String @default("")
 }
