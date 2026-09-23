@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { createAdminProduct, updateAdminProduct } from "@/lib/adminApi";
 import { resolveImageUrl } from "@/lib/api";
-import type { Category, Product, ProductTint } from "@/lib/types";
+import type { Category, Product } from "@/lib/types";
 
 const ICON_OPTIONS: { value: string; label: string }[] = [
   { value: "bag", label: "شنطة" },
@@ -12,12 +12,6 @@ const ICON_OPTIONS: { value: string; label: string }[] = [
   { value: "flower", label: "إكسسوار" },
   { value: "plant", label: "نبات / ديكور" },
   { value: "cardigan", label: "كارديجان" },
-];
-
-const TINT_OPTIONS: { value: ProductTint; label: string; color: string }[] = [
-  { value: "teal", label: "تركواز", color: "var(--teal)" },
-  { value: "rose", label: "وردي", color: "var(--rose)" },
-  { value: "olive", label: "زيتي", color: "var(--olive)" },
 ];
 
 interface FormState {
@@ -29,16 +23,17 @@ interface FormState {
   descEn: string;
   category: string;
   icon: string;
-  tint: ProductTint;
   price: string;
   isNew: boolean;
   showInHero: boolean;
 }
 
-interface NewImage {
-  file: File;
-  previewUrl: string;
-}
+// A single ordered list mixing already-uploaded photos and newly-picked
+// files, so admins can reorder across both and pick any of them as the
+// cover — not just append new ones after the existing set.
+type ImageItem =
+  | { id: string; kind: "existing"; url: string }
+  | { id: string; kind: "new"; file: File; previewUrl: string };
 
 function emptyForm(defaultCategory: string): FormState {
   return {
@@ -50,7 +45,6 @@ function emptyForm(defaultCategory: string): FormState {
     descEn: "",
     category: defaultCategory,
     icon: "bag",
-    tint: "teal",
     price: "",
     isNew: false,
     showInHero: false,
@@ -67,7 +61,6 @@ function fromProduct(product: Product): FormState {
     descEn: product.desc.en,
     category: product.category,
     icon: product.icon,
-    tint: product.tint,
     price: String(product.price),
     isNew: product.isNew,
     showInHero: product.showInHero,
@@ -93,8 +86,7 @@ export default function ProductFormModal({
   const [form, setForm] = useState<FormState>(() =>
     product ? fromProduct(product) : emptyForm(selectableCategories[0]?.key ?? "")
   );
-  const [existingImages, setExistingImages] = useState<string[]>([]);
-  const [newImages, setNewImages] = useState<NewImage[]>([]);
+  const [images, setImages] = useState<ImageItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -102,8 +94,7 @@ export default function ProductFormModal({
   useEffect(() => {
     if (!open) return;
     setForm(product ? fromProduct(product) : emptyForm(selectableCategories[0]?.key ?? ""));
-    setExistingImages(product?.images ?? []);
-    setNewImages([]);
+    setImages((product?.images ?? []).map((url) => ({ id: url, kind: "existing", url })));
     setError("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, product]);
@@ -111,9 +102,11 @@ export default function ProductFormModal({
   // Release object URLs created for new-image previews once they're no longer needed.
   useEffect(() => {
     return () => {
-      newImages.forEach((img) => URL.revokeObjectURL(img.previewUrl));
+      images.forEach((img) => {
+        if (img.kind === "new") URL.revokeObjectURL(img.previewUrl);
+      });
     };
-  }, [newImages]);
+  }, [images]);
 
   if (!open) return null;
 
@@ -123,20 +116,28 @@ export default function ProductFormModal({
 
   function addFiles(files: FileList | null) {
     if (!files) return;
-    const accepted = Array.from(files)
+    const accepted: ImageItem[] = Array.from(files)
       .filter((file) => file.type.startsWith("image/"))
-      .map((file) => ({ file, previewUrl: URL.createObjectURL(file) }));
-    setNewImages((prev) => [...prev, ...accepted]);
+      .map((file) => {
+        const previewUrl = URL.createObjectURL(file);
+        return { id: previewUrl, kind: "new", file, previewUrl };
+      });
+    setImages((prev) => [...prev, ...accepted]);
   }
 
-  function removeExistingImage(url: string) {
-    setExistingImages((prev) => prev.filter((u) => u !== url));
+  function removeImage(id: string) {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (target?.kind === "new") URL.revokeObjectURL(target.previewUrl);
+      return prev.filter((img) => img.id !== id);
+    });
   }
 
-  function removeNewImage(index: number) {
-    setNewImages((prev) => {
-      URL.revokeObjectURL(prev[index].previewUrl);
-      return prev.filter((_, i) => i !== index);
+  function makeCover(id: string) {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+      return [target, ...prev.filter((img) => img.id !== id)];
     });
   }
 
@@ -165,12 +166,19 @@ export default function ProductFormModal({
       fd.append("descEn", form.descEn.trim());
       fd.append("category", form.category);
       fd.append("icon", form.icon);
-      fd.append("tint", form.tint);
       fd.append("price", form.price);
       fd.append("isNew", String(form.isNew));
       fd.append("showInHero", String(form.showInHero));
-      existingImages.forEach((url) => fd.append("existingImages", url));
-      newImages.forEach((img) => fd.append("images", img.file));
+
+      // The final order (including which image is the cover) is carried by
+      // imageOrder — a per-slot list of either an existing image's URL or
+      // the "__new__" placeholder, aligned with the order new files are
+      // appended below. The server interleaves them back together.
+      const imageOrder = images.map((img) => (img.kind === "existing" ? img.url : "__new__"));
+      fd.append("imageOrder", JSON.stringify(imageOrder));
+      images.forEach((img) => {
+        if (img.kind === "new") fd.append("images", img.file);
+      });
 
       const saved =
         isEdit && product ? await updateAdminProduct(product.id, fd) : await createAdminProduct(fd);
@@ -268,27 +276,6 @@ export default function ProductFormModal({
             </div>
           </div>
 
-          <div className="field">
-            <label>اللون المميز (يظهر لو مفيش صور حقيقية)</label>
-            <div className="flex gap-3">
-              {TINT_OPTIONS.map((opt) => (
-                <button
-                  type="button"
-                  key={opt.value}
-                  onClick={() => updateField("tint", opt.value)}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold border-2"
-                  style={{
-                    borderColor: form.tint === opt.value ? opt.color : "var(--beige-200)",
-                    color: "var(--ink)",
-                  }}
-                >
-                  <span className="w-3.5 h-3.5 rounded-full" style={{ background: opt.color }} />
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <label className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--ink-soft)" }}>
             <input
               type="checkbox"
@@ -310,48 +297,58 @@ export default function ProductFormModal({
           </label>
 
           <div className="field">
-            <label>صور المنتج (اختياري — لو مفيش، هيظهر شكل أيقوني بدلها. أول صورة بتبقى الغلاف)</label>
+            <label>صور المنتج — الصورة اللي عليها علامة النجمة هي اللي بتظهر كغلاف في المتجر</label>
 
-            {(existingImages.length > 0 || newImages.length > 0) && (
+            {images.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
-                {existingImages.map((url) => (
-                  <div key={url} className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={resolveImageUrl(url)}
-                      alt="صورة المنتج"
-                      className="w-full aspect-square object-cover rounded-xl"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeExistingImage(url)}
-                      className="absolute -top-2 -end-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                      style={{ background: "var(--rose)", color: "#fff" }}
-                      aria-label="إزالة الصورة"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-                {newImages.map((img, index) => (
-                  <div key={img.previewUrl} className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={img.previewUrl}
-                      alt="صورة جديدة"
-                      className="w-full aspect-square object-cover rounded-xl"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeNewImage(index)}
-                      className="absolute -top-2 -end-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                      style={{ background: "var(--rose)", color: "#fff" }}
-                      aria-label="إزالة الصورة"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                {images.map((img, index) => {
+                  const isCover = index === 0;
+                  const src = img.kind === "existing" ? resolveImageUrl(img.url) : img.previewUrl;
+                  return (
+                    <div key={img.id} className="relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={src}
+                        alt="صورة المنتج"
+                        className="w-full aspect-square object-cover rounded-xl"
+                        style={isCover ? { boxShadow: "0 0 0 2px var(--teal)" } : undefined}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(img.id)}
+                        className="absolute -top-2 -end-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                        style={{ background: "var(--rose)", color: "#fff" }}
+                        aria-label="إزالة الصورة"
+                      >
+                        ×
+                      </button>
+                      {isCover ? (
+                        <span
+                          className="absolute bottom-1.5 start-1.5 w-6 h-6 rounded-full flex items-center justify-center"
+                          style={{ background: "var(--teal)", color: "#fff" }}
+                          title="الصورة الرئيسية"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                          </svg>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => makeCover(img.id)}
+                          className="absolute bottom-1.5 start-1.5 w-6 h-6 rounded-full flex items-center justify-center"
+                          style={{ background: "rgba(251,243,226,.92)", color: "var(--teal)", border: "1px solid var(--beige-200)" }}
+                          title="اجعليها الصورة الرئيسية"
+                          aria-label="اجعليها الصورة الرئيسية"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 

@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { withAdmin } from "@/server/adminAuth";
 import { deleteImagesFromR2, uploadFileToR2 } from "@/server/r2";
 import { productService } from "@/server/services/ProductService";
-import type { Product, ProductTint } from "@/lib/types";
-
-const VALID_TINTS: ProductTint[] = ["teal", "rose", "olive"];
+import type { Product } from "@/lib/types";
 
 function toBool(value: unknown): boolean {
   return value === true || value === "true" || value === "1" || value === "on";
@@ -28,24 +26,29 @@ export const PUT = withAdmin(async (request, context) => {
   const descEn = formData.get("descEn");
   const category = formData.get("category");
   const icon = formData.get("icon");
-  const tint = formData.get("tint");
   const price = formData.get("price");
   const isNew = formData.get("isNew");
   const showInHero = formData.get("showInHero");
   const newImageFiles = formData
     .getAll("images")
     .filter((f): f is File => f instanceof File && f.size > 0);
-  // Which of the product's CURRENT images the admin chose to keep — anything
-  // in `existing.images` but not in this list gets deleted from R2.
-  const existingImagesToKeep = formData.getAll("existingImages").filter(
-    (v): v is string => typeof v === "string"
-  );
+  // Final image order (existing URLs interleaved with "__new__" placeholders
+  // for each newly-uploaded file, in the admin's chosen order — the first
+  // slot is the cover). Anything from existing.images that isn't among the
+  // URL entries here was removed by the admin and gets deleted from R2.
+  const imageOrderRaw = formData.get("imageOrder");
+  let imageOrder: string[] | null = null;
+  try {
+    const parsed = typeof imageOrderRaw === "string" ? JSON.parse(imageOrderRaw) : null;
+    if (Array.isArray(parsed)) imageOrder = parsed.filter((v): v is string => typeof v === "string");
+  } catch {
+    imageOrder = null;
+  }
 
   const patch: Partial<Product> = {};
 
   if (typeof category === "string" && category.trim()) patch.category = category.trim();
   if (typeof icon === "string" && icon.trim()) patch.icon = icon.trim();
-  if (VALID_TINTS.includes(tint as ProductTint)) patch.tint = tint as ProductTint;
   if (price !== null) {
     const numericPrice = Number(price);
     if (Number.isNaN(numericPrice) || numericPrice <= 0) {
@@ -74,9 +77,22 @@ export const PUT = withAdmin(async (request, context) => {
     };
   }
 
-  const removedImages = existing.images.filter((url) => !existingImagesToKeep.includes(url));
   const uploadedUrls = await Promise.all(newImageFiles.map((file) => uploadFileToR2(file)));
-  patch.images = [...existingImagesToKeep, ...uploadedUrls];
+
+  let finalImages: string[];
+  let existingImagesToKeep: string[];
+  if (imageOrder) {
+    let newIdx = 0;
+    finalImages = imageOrder.map((token) => (token === "__new__" ? uploadedUrls[newIdx++] : token));
+    existingImagesToKeep = imageOrder.filter((token) => token !== "__new__");
+  } else {
+    // Fallback for any caller not sending imageOrder: keep all existing, append new.
+    existingImagesToKeep = existing.images;
+    finalImages = [...existingImagesToKeep, ...uploadedUrls];
+  }
+
+  const removedImages = existing.images.filter((url) => !existingImagesToKeep.includes(url));
+  patch.images = finalImages;
   await deleteImagesFromR2(removedImages);
 
   const updated = await productService.update(id, patch);

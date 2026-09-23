@@ -25,7 +25,11 @@ model Product {
   id         Int      @id @default(autoincrement())
   category   String
   icon       String
-  tint       String
+  // No longer editable from the admin panel — every product now ships with
+  // real photos, so the tinted icon-tile fallback this drove is effectively
+  // retired. Kept (defaulted) rather than dropped, since it's still read as
+  // a fallback if a product somehow ends up with zero images.
+  tint       String   @default("teal")
   price      Int
   isNew      Boolean  @default(false)
   // Featured in the homepage Hero carousel when true.

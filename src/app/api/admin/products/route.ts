@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { withAdmin } from "@/server/adminAuth";
 import { uploadFileToR2 } from "@/server/r2";
 import { productService } from "@/server/services/ProductService";
-import type { Product, ProductTint } from "@/lib/types";
-
-const VALID_TINTS: ProductTint[] = ["teal", "rose", "olive"];
+import type { Product } from "@/lib/types";
 
 function toBool(value: unknown): boolean {
   return value === true || value === "true" || value === "1" || value === "on";
@@ -26,7 +24,6 @@ export const POST = withAdmin(async (request) => {
   const descEn = formData.get("descEn");
   const category = formData.get("category");
   const icon = formData.get("icon");
-  const tint = formData.get("tint");
   const price = formData.get("price");
   const isNew = formData.get("isNew");
   const showInHero = formData.get("showInHero");
@@ -43,20 +40,21 @@ export const POST = withAdmin(async (request) => {
     !category.trim() ||
     typeof icon !== "string" ||
     !icon.trim() ||
-    !VALID_TINTS.includes(tint as ProductTint) ||
     Number.isNaN(numericPrice) ||
     numericPrice <= 0
   ) {
     return NextResponse.json({ error: "Missing or invalid product fields" }, { status: 400 });
   }
 
+  // A brand-new product has no existing images to interleave with, so the
+  // files are already in the admin's chosen order (cover first) as sent.
   const images = await Promise.all(imageFiles.map((file) => uploadFileToR2(file)));
 
   const product: Product = {
     id: Date.now(),
     category: category.trim(),
     icon: icon.trim(),
-    tint: tint as ProductTint,
+    tint: "teal",
     price: numericPrice,
     isNew: toBool(isNew),
     showInHero: toBool(showInHero),
