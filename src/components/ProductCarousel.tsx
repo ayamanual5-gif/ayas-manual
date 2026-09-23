@@ -82,8 +82,8 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
                 product={product}
                 isActive={isActive}
                 x={`calc(-50% + ${dir * d * stepPx}px)`}
-                scale={isActive ? 1 : 0.86}
-                opacity={abs > 1 ? 0 : 1}
+                scale={isActive ? 1.05 : 0.82}
+                opacity={isActive ? 1 : abs === 1 ? 0.7 : 0}
                 zIndex={10 - abs}
                 width={cardWidth}
                 lang={lang}
@@ -218,9 +218,11 @@ function CarouselCard({
         )}
         <div className="carousel-card-info">
           <h3 className="carousel-card-name">{product.name[lang]}</h3>
-          <div className="carousel-card-price">
-            {product.price} {t("currency")}
-          </div>
+          {isActive && (
+            <div className="carousel-card-price">
+              {product.price} {t("currency")}
+            </div>
+          )}
           {isActive && (
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} transition={{ duration: 0.15, ease: EASE }}>
               <button type="button" className="btn btn-outline w-full !py-2.5 text-sm mt-2" onClick={onOpen}>

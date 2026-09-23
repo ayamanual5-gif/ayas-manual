@@ -356,8 +356,11 @@ textarea {
 }
 .carousel-card {
   position: absolute;
-  top: 0;
-  height: 100%;
+  /* 95% height with 2.5% top headroom, so the active card's 1.05 scale-up
+     (95% * 1.05 ≈ 99.75%) lands just inside the viewport instead of being
+     clipped top/bottom by overflow: hidden. */
+  top: 2.5%;
+  height: 95%;
   cursor: grab;
 }
 .carousel-card-inner {
