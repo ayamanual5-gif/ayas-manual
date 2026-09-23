@@ -11,7 +11,11 @@ function toCategory(row: { key: string; ar: string; en: string }): CategoryWithI
 class PrismaCategoryService implements StorageService<CategoryWithId> {
   async getAll(): Promise<CategoryWithId[]> {
     const rows = await prisma.category.findMany({ orderBy: { key: "asc" } });
-    return rows.map(toCategory);
+    const categories = rows.map(toCategory);
+    // "all" sorts alphabetically wherever its letters happen to land (e.g.
+    // after "accessories") — it should always be the first tab regardless.
+    categories.sort((a, b) => (a.key === "all" ? -1 : b.key === "all" ? 1 : 0));
+    return categories;
   }
 
   async getById(id: number | string): Promise<CategoryWithId | undefined> {
