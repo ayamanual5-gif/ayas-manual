@@ -190,6 +190,7 @@ export const translations = {
 
   "nav.login": { ar: "تسجيل الدخول", en: "Log In" },
   "nav.logout": { ar: "تسجيل الخروج", en: "Log Out" },
+  "nav.dashboard": { ar: "لوحة التحكم", en: "Dashboard" },
 
   "auth.loginTitle": { ar: "تسجيل الدخول", en: "Log In" },
   "auth.loginSub": { ar: "سجّلي دخولك لمتابعة طلباتك", en: "Log in to track your orders" },

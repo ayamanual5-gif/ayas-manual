@@ -128,7 +128,21 @@ export default function Header() {
             >
               {lang === "ar" ? "EN" : "AR"}
             </motion.button>
-            {user ? (
+            {user?.role === "ADMIN" ? (
+              <Link
+                href="/admin"
+                className="hidden sm:flex p-2.5 rounded-full hover:bg-beige-200/60"
+                aria-label={t("nav.dashboard")}
+                title={t("nav.dashboard")}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                  <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                  <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                  <rect x="3" y="16" width="7" height="5" rx="1.5" />
+                </svg>
+              </Link>
+            ) : user ? (
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 className="hidden sm:flex p-2.5 rounded-full hover:bg-beige-200/60"
@@ -212,7 +226,16 @@ export default function Header() {
                     </Link>
                   </motion.div>
                 ))}
-                {user ? (
+                {user?.role === "ADMIN" ? (
+                  <Link
+                    href="/admin"
+                    className="py-2 px-2 rounded-lg hover:bg-beige-200/60 sm:hidden"
+                    style={{ color: "var(--ink-soft)" }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {t("nav.dashboard")}
+                  </Link>
+                ) : user ? (
                   <button
                     type="button"
                     className="text-start py-2 px-2 rounded-lg hover:bg-beige-200/60 sm:hidden"
