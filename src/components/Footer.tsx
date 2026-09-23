@@ -24,7 +24,7 @@ const emptySettings: Settings = {
 };
 
 export default function Footer() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const [settings, setSettings] = useState<Settings>(emptySettings);
 
   useEffect(() => {
@@ -68,7 +68,13 @@ export default function Footer() {
         <div>
           <p className="font-semibold opacity-90">{t("footer.contactTitle")}</p>
           <div className="mt-3 flex flex-col gap-2 opacity-80">
-            <span dir="ltr">{settings.whatsappNumber || FALLBACK_PHONE}</span>
+            {/* dir="ltr" keeps the digits/plus-sign in the right order in Arabic
+                mode, but that alone also flips which edge the text hugs — pin
+                it back to the same side as the sibling lines with an explicit
+                (physical, not logical) text-align. */}
+            <span dir="ltr" style={{ display: "block", textAlign: lang === "ar" ? "right" : "left" }}>
+              {settings.whatsappNumber || FALLBACK_PHONE}
+            </span>
             <span>{settings.contactEmail || FALLBACK_EMAIL}</span>
           </div>
         </div>
