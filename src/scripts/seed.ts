@@ -39,6 +39,7 @@ const products: Omit<Product, "id">[] = [
     tint: "teal",
     price: 450,
     isNew: true,
+    showInHero: false,
     name: { ar: "شنطة قش كروشيه", en: "Woven Straw Tote" },
     tag: { ar: "غرزة مفردة · حبل قطن", en: "Single crochet · Cotton cord" },
     desc: {
@@ -53,6 +54,7 @@ const products: Omit<Product, "id">[] = [
     tint: "rose",
     price: 320,
     isNew: false,
+    showInHero: false,
     name: { ar: "شنطة Granny Square صغيرة", en: "Mini Granny Square Bag" },
     tag: { ar: "Granny Square · خليط أكريليك", en: "Granny square · Acrylic blend" },
     desc: {
@@ -67,6 +69,7 @@ const products: Omit<Product, "id">[] = [
     tint: "olive",
     price: 280,
     isNew: false,
+    showInHero: false,
     name: { ar: "اسكارف ريب سميك", en: "Chunky Rib Scarf" },
     tag: { ar: "غرزة ريب · صوف سميك", en: "Ribbing stitch · Chunky wool" },
     desc: {
@@ -81,6 +84,7 @@ const products: Omit<Product, "id">[] = [
     tint: "teal",
     price: 260,
     isNew: true,
+    showInHero: false,
     name: { ar: "اسكارف دائري متدرج", en: "Ombré Infinity Scarf" },
     tag: { ar: "صبغة أومبريه · خليط موهير", en: "Ombré dye · Mohair blend" },
     desc: {
@@ -95,6 +99,7 @@ const products: Omit<Product, "id">[] = [
     tint: "rose",
     price: 120,
     isNew: false,
+    showInHero: false,
     name: { ar: "طقم مشابك شعر بالخرز", en: "Beaded Hair Clip Set" },
     tag: { ar: "تطريز خرز · خيط قطن", en: "Bead trim · Cotton thread" },
     desc: {
@@ -109,6 +114,7 @@ const products: Omit<Product, "id">[] = [
     tint: "olive",
     price: 95,
     isNew: false,
+    showInHero: false,
     name: { ar: "إسورة كروشيه", en: "Wrist Cuff Bracelet" },
     tag: { ar: "غرزة الصدفة · قطن", en: "Shell stitch · Cotton" },
     desc: {
@@ -123,6 +129,7 @@ const products: Omit<Product, "id">[] = [
     tint: "olive",
     price: 180,
     isNew: false,
+    showInHero: false,
     name: { ar: "معلقة نباتات مكرمية", en: "Macramé Plant Hanger" },
     tag: { ar: "حبل مكرمية · جوت طبيعي", en: "Macramé cord · Natural jute" },
     desc: {
@@ -137,6 +144,7 @@ const products: Omit<Product, "id">[] = [
     tint: "rose",
     price: 240,
     isNew: true,
+    showInHero: false,
     name: { ar: "مخدة كروشيه مزخرفة", en: "Textured Throw Pillow" },
     tag: { ar: "غرزة البوبكورن · صوف", en: "Popcorn stitch · Wool" },
     desc: {
@@ -151,6 +159,7 @@ const products: Omit<Product, "id">[] = [
     tint: "teal",
     price: 620,
     isNew: false,
+    showInHero: false,
     name: { ar: "كارديجان قصير هافل", en: "Cropped Waffle Cardigan" },
     tag: { ar: "غرزة الوافل · خليط قطن", en: "Waffle stitch · Cotton blend" },
     desc: {
@@ -165,6 +174,7 @@ const products: Omit<Product, "id">[] = [
     tint: "rose",
     price: 690,
     isNew: true,
+    showInHero: false,
     name: { ar: "كارديجان غراني أوفرسايز", en: "Oversized Granny Cardigan" },
     tag: { ar: "Granny Square · خليط صوف", en: "Granny square · Wool blend" },
     desc: {

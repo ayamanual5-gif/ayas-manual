@@ -32,6 +32,7 @@ interface FormState {
   tint: ProductTint;
   price: string;
   isNew: boolean;
+  showInHero: boolean;
 }
 
 interface NewImage {
@@ -52,6 +53,7 @@ function emptyForm(defaultCategory: string): FormState {
     tint: "teal",
     price: "",
     isNew: false,
+    showInHero: false,
   };
 }
 
@@ -68,6 +70,7 @@ function fromProduct(product: Product): FormState {
     tint: product.tint,
     price: String(product.price),
     isNew: product.isNew,
+    showInHero: product.showInHero,
   };
 }
 
@@ -165,6 +168,7 @@ export default function ProductFormModal({
       fd.append("tint", form.tint);
       fd.append("price", form.price);
       fd.append("isNew", String(form.isNew));
+      fd.append("showInHero", String(form.showInHero));
       existingImages.forEach((url) => fd.append("existingImages", url));
       newImages.forEach((img) => fd.append("images", img.file));
 
@@ -180,13 +184,16 @@ export default function ProductFormModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 overflow-y-auto"
+      className="fixed inset-0 z-[60] flex items-start justify-center p-4 pt-8 sm:pt-12 bg-black/40 overflow-y-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="card max-w-2xl w-full p-6 sm:p-7 my-8">
-        <div className="flex items-center justify-between mb-5">
+      <div className="card max-w-2xl w-full flex flex-col" style={{ maxHeight: "85vh" }}>
+        <div
+          className="flex items-center justify-between px-6 sm:px-7 pt-6 sm:pt-7 pb-4 flex-shrink-0 border-b"
+          style={{ borderColor: "var(--beige-200)" }}
+        >
           <h3 className="font-display text-xl" style={{ color: "var(--teal)" }}>
             {isEdit ? "تعديل منتج" : "إضافة منتج جديد"}
           </h3>
@@ -197,7 +204,8 @@ export default function ProductFormModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto px-6 sm:px-7 py-5 space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="field">
               <label>اسم المنتج (عربي)</label>
@@ -291,6 +299,16 @@ export default function ProductFormModal({
             وسم المنتج بـ &quot;جديد&quot;
           </label>
 
+          <label className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--ink-soft)" }}>
+            <input
+              type="checkbox"
+              checked={form.showInHero}
+              onChange={(e) => updateField("showInHero", e.target.checked)}
+              className="w-4 h-4"
+            />
+            إظهار المنتج في الدائرة الرئيسية (Hero Carousel)
+          </label>
+
           <div className="field">
             <label>صور المنتج (اختياري — لو مفيش، هيظهر شكل أيقوني بدلها. أول صورة بتبقى الغلاف)</label>
 
@@ -360,15 +378,19 @@ export default function ProductFormModal({
               {error}
             </p>
           )}
+        </div>
 
-          <div className="flex gap-3 pt-2">
-            <button type="button" className="btn btn-outline flex-1 py-2.5" onClick={onClose}>
-              إلغاء
-            </button>
-            <button type="submit" className="btn btn-primary flex-1 py-2.5 disabled:opacity-60" disabled={submitting}>
-              {submitting ? "جاري الحفظ..." : "حفظ"}
-            </button>
-          </div>
+        <div
+          className="flex gap-3 px-6 sm:px-7 py-4 flex-shrink-0 border-t"
+          style={{ borderColor: "var(--beige-200)" }}
+        >
+          <button type="button" className="btn btn-outline flex-1 py-2.5" onClick={onClose}>
+            إلغاء
+          </button>
+          <button type="submit" className="btn btn-primary flex-1 py-2.5 disabled:opacity-60" disabled={submitting}>
+            {submitting ? "جاري الحفظ..." : "حفظ"}
+          </button>
+        </div>
         </form>
       </div>
     </div>

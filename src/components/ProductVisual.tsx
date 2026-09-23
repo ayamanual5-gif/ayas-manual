@@ -9,9 +9,12 @@ import type { Product } from "@/lib/types";
 export default function ProductVisual({
   product,
   className = "",
+  eager = false,
 }: {
   product: Product;
   className?: string;
+  /** Skip lazy-loading for above-the-fold images (e.g. the active Hero carousel card). */
+  eager?: boolean;
 }) {
   const cover = product.images?.[0];
 
@@ -23,6 +26,9 @@ export default function ProductVisual({
           src={resolveImageUrl(cover)}
           alt={product.name.ar}
           className="w-full h-full object-cover"
+          loading={eager ? "eager" : "lazy"}
+          decoding={eager ? "sync" : "async"}
+          fetchPriority={eager ? "high" : "auto"}
         />
       </div>
     );

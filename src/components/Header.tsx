@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/context/LangContext";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import Logo from "./Logo";
 import { EASE } from "./motion/variants";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
@@ -21,6 +22,7 @@ const navLinks: { href: string; key: TranslationKey }[] = [
 export default function Header() {
   const { lang, toggleLang, t } = useLang();
   const { count, openCart } = useCart();
+  const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   useBodyScrollLock(mobileOpen);
@@ -126,17 +128,32 @@ export default function Header() {
             >
               {lang === "ar" ? "EN" : "AR"}
             </motion.button>
-            <Link
-              href="/admin/login"
-              className="hidden sm:flex p-2.5 rounded-full hover:bg-beige-200/60"
-              aria-label="تسجيل دخول الأدمين"
-              title="تسجيل دخول الأدمين"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="4" y="10" width="16" height="10" rx="2" />
-                <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-              </svg>
-            </Link>
+            {user ? (
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                className="hidden sm:flex p-2.5 rounded-full hover:bg-beige-200/60"
+                aria-label={t("nav.logout")}
+                title={user.name ?? user.email}
+                onClick={() => logout()}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 12H9M15 8l4 4-4 4" />
+                  <path d="M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7" />
+                </svg>
+              </motion.button>
+            ) : (
+              <Link
+                href="/login"
+                className="hidden sm:flex p-2.5 rounded-full hover:bg-beige-200/60"
+                aria-label={t("nav.login")}
+                title={t("nav.login")}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="3.5" />
+                  <path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6" />
+                </svg>
+              </Link>
+            )}
             <motion.button
               className="relative p-2.5 rounded-full hover:bg-beige-200/60"
               aria-label="Cart"
@@ -195,14 +212,28 @@ export default function Header() {
                     </Link>
                   </motion.div>
                 ))}
-                <Link
-                  href="/admin/login"
-                  className="py-2 px-2 rounded-lg hover:bg-beige-200/60 sm:hidden"
-                  style={{ color: "var(--ink-soft)" }}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  تسجيل دخول الأدمين
-                </Link>
+                {user ? (
+                  <button
+                    type="button"
+                    className="text-start py-2 px-2 rounded-lg hover:bg-beige-200/60 sm:hidden"
+                    style={{ color: "var(--ink-soft)" }}
+                    onClick={() => {
+                      setMobileOpen(false);
+                      logout();
+                    }}
+                  >
+                    {t("nav.logout")}
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="py-2 px-2 rounded-lg hover:bg-beige-200/60 sm:hidden"
+                    style={{ color: "var(--ink-soft)" }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {t("nav.login")}
+                  </Link>
+                )}
               </div>
             </motion.nav>
           )}

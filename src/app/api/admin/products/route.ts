@@ -29,6 +29,7 @@ export const POST = withAdmin(async (request) => {
   const tint = formData.get("tint");
   const price = formData.get("price");
   const isNew = formData.get("isNew");
+  const showInHero = formData.get("showInHero");
   const imageFiles = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
 
   const numericPrice = Number(price);
@@ -58,6 +59,7 @@ export const POST = withAdmin(async (request) => {
     tint: tint as ProductTint,
     price: numericPrice,
     isNew: toBool(isNew),
+    showInHero: toBool(showInHero),
     name: { ar: nameAr.trim(), en: nameEn.trim() },
     tag: {
       ar: typeof tagAr === "string" ? tagAr.trim() : "",

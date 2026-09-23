@@ -12,12 +12,20 @@ export async function fetchCategories(): Promise<Category[]> {
   return res.json();
 }
 
-export async function submitOrder(payload: OrderPayload) {
-  const res = await fetch("/api/orders", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+export async function submitOrder(payload: OrderPayload, paymentProof?: File | null) {
+  const fd = new FormData();
+  fd.append("customerName", payload.customerName);
+  fd.append("phone", payload.phone);
+  fd.append("address", payload.address);
+  fd.append("city", payload.city);
+  fd.append("paymentMethod", payload.paymentMethod);
+  if (payload.paymentReference) fd.append("paymentReference", payload.paymentReference);
+  if (payload.notes) fd.append("notes", payload.notes);
+  fd.append("subtotal", String(payload.subtotal));
+  fd.append("items", JSON.stringify(payload.items));
+  if (paymentProof) fd.append("paymentProof", paymentProof);
+
+  const res = await fetch("/api/orders", { method: "POST", body: fd });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || "Failed to submit order");

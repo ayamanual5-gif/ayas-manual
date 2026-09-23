@@ -22,12 +22,14 @@ export default function CheckoutPage() {
 
   const [instapayHandle, setInstapayHandle] = useState(FALLBACK_INSTAPAY_HANDLE);
   const [vodafoneCashNumber, setVodafoneCashNumber] = useState(FALLBACK_VODAFONE_CASH_NUMBER);
+  const [whatsappNumber, setWhatsappNumber] = useState("");
 
   useEffect(() => {
     fetchSettings()
       .then((settings) => {
         setInstapayHandle(settings.instapayHandle);
         setVodafoneCashNumber(settings.vodafoneCashNumber);
+        setWhatsappNumber(settings.whatsappNumber);
       })
       .catch(() => {
         // keep the fallback values — the checkout flow still works either way
@@ -41,7 +43,18 @@ export default function CheckoutPage() {
   const [notes, setNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("instapay");
   const [paymentReference, setPaymentReference] = useState("");
+  const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [orderId, setOrderId] = useState<number | null>(null);
+
+  function handleProofChange(file: File | null | undefined) {
+    if (!file || !file.type.startsWith("image/")) return;
+    setPaymentProof(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setProofPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -55,23 +68,34 @@ export default function CheckoutPage() {
     }));
 
     try {
-      await submitOrder({
-        customerName,
-        phone,
-        address,
-        city,
-        paymentMethod,
-        paymentReference,
-        items: orderItems,
-        subtotal,
-        notes,
-      });
+      const saved = await submitOrder(
+        {
+          customerName,
+          phone,
+          address,
+          city,
+          paymentMethod,
+          paymentReference,
+          items: orderItems,
+          subtotal,
+          notes,
+        },
+        paymentProof
+      );
+      setOrderId(saved.id);
       clearCart();
       setStatus("success");
     } catch {
       setStatus("error");
     }
   }
+
+  const whatsappHref =
+    whatsappNumber && orderId
+      ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+          `${t("checkout.whatsappMessage")} #${orderId}`
+        )}`
+      : null;
 
   if (status === "success") {
     return (
@@ -98,9 +122,27 @@ export default function CheckoutPage() {
         <p className="mt-3" style={{ color: "var(--ink-soft)" }}>
           {t("checkout.successMsg")}
         </p>
-        <Link href="/" className="btn btn-primary mt-8 px-7 py-3.5 inline-flex">
-          {t("checkout.backHome")}
-        </Link>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {whatsappHref && (
+            <motion.a
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn px-7 py-3.5 inline-flex items-center gap-2"
+              style={{ background: "#25D366", color: "#fff" }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm5.8 14.14c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11a16.5 16.5 0 0 1-1.6-.6c-2.83-1.22-4.67-4.06-4.81-4.25-.14-.19-1.15-1.53-1.15-2.92 0-1.39.73-2.07 1-2.35.26-.28.57-.35.76-.35h.55c.18 0 .42-.07.65.5.24.58.82 1.99.89 2.13.07.14.12.31.02.5-.09.19-.14.31-.28.47-.14.16-.29.36-.42.48-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.54.33.07.12.07.68-.17 1.36z" />
+              </svg>
+              {t("checkout.whatsappBtn")}
+            </motion.a>
+          )}
+          <Link href="/" className="btn btn-primary px-7 py-3.5 inline-flex">
+            {t("checkout.backHome")}
+          </Link>
+        </div>
       </motion.section>
     );
   }
@@ -229,6 +271,30 @@ export default function CheckoutPage() {
                 onChange={(e) => setPaymentReference(e.target.value)}
                 placeholder={t("checkout.phPaymentRef")}
               />
+            </div>
+
+            <div className="field">
+              <label>{t("checkout.labelPaymentProof")}</label>
+              <div
+                className="dropzone p-4 text-center cursor-pointer"
+                onClick={() => document.getElementById("payment-proof-input")?.click()}
+              >
+                <input
+                  id="payment-proof-input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleProofChange(e.target.files?.[0])}
+                />
+                {proofPreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={proofPreview} alt="" className="mx-auto rounded-xl max-h-40 object-cover" />
+                ) : (
+                  <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
+                    {t("checkout.uploadProofHint")}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 

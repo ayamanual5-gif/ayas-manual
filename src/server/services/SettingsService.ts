@@ -6,14 +6,42 @@ const SETTINGS_ID = 1;
 const defaults: Settings = {
   instapayHandle: "ayasmanual@instapay",
   vodafoneCashNumber: "010 0123 4567",
+  whatsappNumber: "",
+  contactPhone: "",
+  contactEmail: "",
+  contactAddress: "",
+  socialInstagram: "",
+  socialPinterest: "",
 };
+
+function toSettings(row: {
+  instapayHandle: string;
+  vodafoneCashNumber: string;
+  whatsappNumber: string;
+  contactPhone: string;
+  contactEmail: string;
+  contactAddress: string;
+  socialInstagram: string;
+  socialPinterest: string;
+}): Settings {
+  return {
+    instapayHandle: row.instapayHandle,
+    vodafoneCashNumber: row.vodafoneCashNumber,
+    whatsappNumber: row.whatsappNumber,
+    contactPhone: row.contactPhone,
+    contactEmail: row.contactEmail,
+    contactAddress: row.contactAddress,
+    socialInstagram: row.socialInstagram,
+    socialPinterest: row.socialPinterest,
+  };
+}
 
 async function get(): Promise<Settings> {
   const row = await prisma.settings.findUnique({ where: { id: SETTINGS_ID } });
-  if (row) return { instapayHandle: row.instapayHandle, vodafoneCashNumber: row.vodafoneCashNumber };
+  if (row) return toSettings(row);
 
   const created = await prisma.settings.create({ data: { id: SETTINGS_ID, ...defaults } });
-  return { instapayHandle: created.instapayHandle, vodafoneCashNumber: created.vodafoneCashNumber };
+  return toSettings(created);
 }
 
 async function update(patch: Partial<Settings>): Promise<Settings> {
@@ -24,7 +52,7 @@ async function update(patch: Partial<Settings>): Promise<Settings> {
     update: next,
     create: { id: SETTINGS_ID, ...next },
   });
-  return { instapayHandle: row.instapayHandle, vodafoneCashNumber: row.vodafoneCashNumber };
+  return toSettings(row);
 }
 
 export const settingsService = { get, update };

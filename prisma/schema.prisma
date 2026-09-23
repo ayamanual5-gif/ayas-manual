@@ -7,19 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now())
+}
+
 model Product {
-  id       Int      @id @default(autoincrement())
-  category String
-  icon     String
-  tint     String
-  price    Int
-  isNew    Boolean  @default(false)
+  id         Int      @id @default(autoincrement())
+  category   String
+  icon       String
+  tint       String
+  price      Int
+  isNew      Boolean  @default(false)
+  // Featured in the homepage Hero carousel when true.
+  showInHero Boolean  @default(false)
   // { ar: string, en: string } — kept as JSON to mirror the app's LocalizedText shape.
-  name     Json
-  tag      Json
-  desc     Json
+  name       Json
+  tag        Json
+  desc       Json
   // string[] of R2 URLs — first entry is the cover photo shown in listings.
-  images   Json    @default("[]")
+  images     Json    @default("[]")
 }
 
 model Category {
@@ -36,6 +52,8 @@ model Order {
   city             String
   paymentMethod    String
   paymentReference String?
+  // R2 URL of the uploaded InstaPay/Vodafone Cash transfer screenshot.
+  paymentProofUrl  String?
   // OrderItem[] — { productId, name, price, qty }
   items            Json
   subtotal         Int
@@ -60,4 +78,11 @@ model Settings {
   id                 Int    @id @default(1)
   instapayHandle     String
   vodafoneCashNumber String
+  // Used both as the order-confirmation "contact us" number and on the Contact page.
+  whatsappNumber     String @default("")
+  contactPhone       String @default("")
+  contactEmail       String @default("")
+  contactAddress     String @default("")
+  socialInstagram    String @default("")
+  socialPinterest    String @default("")
 }

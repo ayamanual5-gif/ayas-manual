@@ -4,31 +4,44 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { fetchAdminSettings, updateAdminSettings } from "@/lib/adminApi";
 import { useToast } from "@/context/ToastContext";
+import type { Settings } from "@/lib/types";
+
+const emptySettings: Settings = {
+  instapayHandle: "",
+  vodafoneCashNumber: "",
+  whatsappNumber: "",
+  contactPhone: "",
+  contactEmail: "",
+  contactAddress: "",
+  socialInstagram: "",
+  socialPinterest: "",
+};
 
 export default function AdminSettingsPage() {
   const { showToast } = useToast();
-  const [instapayHandle, setInstapayHandle] = useState("");
-  const [vodafoneCashNumber, setVodafoneCashNumber] = useState("");
+  const [form, setForm] = useState<Settings>(emptySettings);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchAdminSettings()
-      .then((settings) => {
-        setInstapayHandle(settings.instapayHandle);
-        setVodafoneCashNumber(settings.vodafoneCashNumber);
-      })
+      .then(setForm)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
+
+  function updateField<K extends keyof Settings>(key: K, value: Settings[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     try {
-      await updateAdminSettings({ instapayHandle, vodafoneCashNumber });
-      showToast("تم حفظ بيانات الدفع");
+      const saved = await updateAdminSettings(form);
+      setForm(saved);
+      showToast("تم حفظ الإعدادات");
     } catch (err) {
       showToast(err instanceof Error ? err.message : "تعذر حفظ البيانات");
     } finally {
@@ -39,10 +52,10 @@ export default function AdminSettingsPage() {
   return (
     <div>
       <h1 className="font-display text-2xl sm:text-3xl" style={{ color: "var(--teal)" }}>
-        إعدادات الدفع
+        الإعدادات
       </h1>
       <p className="mt-1 text-sm" style={{ color: "var(--ink-soft)" }}>
-        البيانات دي بتظهر للعميلات في صفحة إتمام الطلب.
+        بيانات الدفع وبيانات التواصل بتظهر للعميلات في الموقع.
       </p>
 
       {error && (
@@ -58,25 +71,95 @@ export default function AdminSettingsPage() {
       )}
 
       {!error && !loading && (
-        <form onSubmit={handleSubmit} className="mt-6 card p-6 max-w-lg space-y-4">
-          <div className="field">
-            <label>حساب إنستاباي</label>
-            <input
-              value={instapayHandle}
-              onChange={(e) => setInstapayHandle(e.target.value)}
-              placeholder="ayasmanual@instapay"
-              required
-            />
+        <form onSubmit={handleSubmit} className="mt-6 space-y-6 max-w-lg">
+          <div className="card p-6 space-y-4">
+            <h2 className="font-semibold" style={{ color: "var(--teal)" }}>
+              بيانات الدفع
+            </h2>
+            <div className="field">
+              <label>حساب إنستاباي</label>
+              <input
+                value={form.instapayHandle}
+                onChange={(e) => updateField("instapayHandle", e.target.value)}
+                placeholder="ayasmanual@instapay"
+                required
+              />
+            </div>
+            <div className="field">
+              <label>رقم فودافون كاش</label>
+              <input
+                value={form.vodafoneCashNumber}
+                onChange={(e) => updateField("vodafoneCashNumber", e.target.value)}
+                placeholder="010 0123 4567"
+                required
+              />
+            </div>
           </div>
-          <div className="field">
-            <label>رقم فودافون كاش</label>
-            <input
-              value={vodafoneCashNumber}
-              onChange={(e) => setVodafoneCashNumber(e.target.value)}
-              placeholder="010 0123 4567"
-              required
-            />
+
+          <div className="card p-6 space-y-4">
+            <h2 className="font-semibold" style={{ color: "var(--teal)" }}>
+              بيانات التواصل
+            </h2>
+            <p className="text-xs -mt-2" style={{ color: "var(--ink-soft)" }}>
+              رقم الواتساب ده هو نفسه اللي بيظهر زر التواصل بعد إتمام الطلب.
+            </p>
+            <div className="field">
+              <label>رقم الواتساب</label>
+              <input
+                value={form.whatsappNumber}
+                onChange={(e) => updateField("whatsappNumber", e.target.value)}
+                placeholder="+20 100 123 4567"
+              />
+            </div>
+            <div className="field">
+              <label>رقم الهاتف</label>
+              <input
+                value={form.contactPhone}
+                onChange={(e) => updateField("contactPhone", e.target.value)}
+                placeholder="+20 100 123 4567"
+              />
+            </div>
+            <div className="field">
+              <label>البريد الإلكتروني</label>
+              <input
+                type="email"
+                value={form.contactEmail}
+                onChange={(e) => updateField("contactEmail", e.target.value)}
+                placeholder="hello@ayasmanual.com"
+              />
+            </div>
+            <div className="field">
+              <label>العنوان</label>
+              <input
+                value={form.contactAddress}
+                onChange={(e) => updateField("contactAddress", e.target.value)}
+                placeholder="القاهرة، مصر"
+              />
+            </div>
           </div>
+
+          <div className="card p-6 space-y-4">
+            <h2 className="font-semibold" style={{ color: "var(--teal)" }}>
+              روابط التواصل الاجتماعي
+            </h2>
+            <div className="field">
+              <label>إنستجرام (رابط كامل)</label>
+              <input
+                value={form.socialInstagram}
+                onChange={(e) => updateField("socialInstagram", e.target.value)}
+                placeholder="https://instagram.com/ayasmanual"
+              />
+            </div>
+            <div className="field">
+              <label>بينترست (رابط كامل)</label>
+              <input
+                value={form.socialPinterest}
+                onChange={(e) => updateField("socialPinterest", e.target.value)}
+                placeholder="https://pinterest.com/ayasmanual"
+              />
+            </div>
+          </div>
+
           <button type="submit" className="btn btn-primary px-6 py-2.5 disabled:opacity-60" disabled={saving}>
             {saving ? "جاري الحفظ..." : "حفظ"}
           </button>

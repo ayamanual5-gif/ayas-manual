@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { orderService } from "@/server/services/OrderService";
+import { uploadFileToR2 } from "@/server/r2";
 import type { Order, OrderItem } from "@/lib/types";
 
 function isValidItem(item: unknown): item is OrderItem {
@@ -16,18 +17,28 @@ function isValidItem(item: unknown): item is OrderItem {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null);
-  const {
-    customerName,
-    phone,
-    address,
-    city,
-    paymentMethod,
-    paymentReference,
-    items,
-    subtotal,
-    notes,
-  } = body ?? {};
+  const formData = await request.formData().catch(() => null);
+  if (!formData) {
+    return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+  }
+
+  const customerName = formData.get("customerName");
+  const phone = formData.get("phone");
+  const address = formData.get("address");
+  const city = formData.get("city");
+  const paymentMethod = formData.get("paymentMethod");
+  const paymentReference = formData.get("paymentReference");
+  const notes = formData.get("notes");
+  const subtotal = formData.get("subtotal");
+  const itemsRaw = formData.get("items");
+  const proofFile = formData.get("paymentProof");
+
+  let items: unknown;
+  try {
+    items = typeof itemsRaw === "string" ? JSON.parse(itemsRaw) : null;
+  } catch {
+    items = null;
+  }
 
   if (
     typeof customerName !== "string" ||
@@ -46,6 +57,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const paymentProofUrl =
+      proofFile instanceof File && proofFile.size > 0 ? await uploadFileToR2(proofFile) : undefined;
+
     const order: Order = {
       id: Date.now(),
       customerName: customerName.trim(),
@@ -55,8 +69,9 @@ export async function POST(request: NextRequest) {
       paymentMethod,
       paymentReference:
         typeof paymentReference === "string" ? paymentReference.trim() : undefined,
+      paymentProofUrl,
       items,
-      subtotal: typeof subtotal === "number" ? subtotal : 0,
+      subtotal: typeof subtotal === "string" ? Number(subtotal) || 0 : 0,
       notes: typeof notes === "string" ? notes.trim() : undefined,
       status: "pending",
       createdAt: new Date().toISOString(),

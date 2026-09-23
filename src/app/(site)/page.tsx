@@ -18,9 +18,15 @@ export default async function HomePage() {
     // The featured strip just hides itself when there's nothing to show
   }
 
+  // Admin can hand-pick which products appear in the Hero carousel; if none
+  // are flagged yet, fall back to showing some so the Hero is never empty.
+  const heroProducts = products.some((p) => p.showInHero)
+    ? products.filter((p) => p.showInHero)
+    : products;
+
   return (
     <>
-      <Hero products={products} />
+      <Hero products={heroProducts} />
       <ValueStrip />
       <HomeFeatured products={products} />
       <HomeTeasers />

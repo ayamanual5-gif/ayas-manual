@@ -31,6 +31,7 @@ export const PUT = withAdmin(async (request, context) => {
   const tint = formData.get("tint");
   const price = formData.get("price");
   const isNew = formData.get("isNew");
+  const showInHero = formData.get("showInHero");
   const newImageFiles = formData
     .getAll("images")
     .filter((f): f is File => f instanceof File && f.size > 0);
@@ -53,6 +54,7 @@ export const PUT = withAdmin(async (request, context) => {
     patch.price = numericPrice;
   }
   if (isNew !== null) patch.isNew = toBool(isNew);
+  if (showInHero !== null) patch.showInHero = toBool(showInHero);
   if (typeof nameAr === "string" || typeof nameEn === "string") {
     patch.name = {
       ar: typeof nameAr === "string" ? nameAr : existing.name.ar,

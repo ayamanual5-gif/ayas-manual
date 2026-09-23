@@ -137,6 +137,13 @@ export const translations = {
   },
   "checkout.labelPaymentRef": { ar: "رقم العملية / آخر 4 أرقام", en: "Transaction ID / last 4 digits" },
   "checkout.phPaymentRef": { ar: "مثال: 4821", en: "e.g. 4821" },
+  "checkout.labelPaymentProof": { ar: "صورة إثبات التحويل (اختياري)", en: "Payment Screenshot (optional)" },
+  "checkout.uploadProofHint": { ar: "اضغطي لرفع صورة إثبات التحويل", en: "Click to upload a screenshot of the transfer" },
+  "checkout.whatsappBtn": { ar: "تواصلي معنا عبر واتساب", en: "Contact us on WhatsApp" },
+  "checkout.whatsappMessage": {
+    ar: "مرحباً، أنا عايزة أتابع طلبي رقم",
+    en: "Hi, I'd like to follow up on my order number",
+  },
   "checkout.submit": { ar: "تأكيد الطلب", en: "Confirm Order" },
   "checkout.submitting": { ar: "جاري إرسال الطلب...", en: "Submitting order..." },
   "checkout.errorMsg": {
@@ -180,6 +187,28 @@ export const translations = {
     en: "Upload a photo of the piece you have in mind, and we'll crochet it true to the picture — or with our own signature twist.",
   },
   "home.customTeaserCta": { ar: "اطلبي تصميم خاص", en: "Start a custom order" },
+
+  "nav.login": { ar: "تسجيل الدخول", en: "Log In" },
+  "nav.logout": { ar: "تسجيل الخروج", en: "Log Out" },
+
+  "auth.loginTitle": { ar: "تسجيل الدخول", en: "Log In" },
+  "auth.loginSub": { ar: "سجّلي دخولك لمتابعة طلباتك", en: "Log in to track your orders" },
+  "auth.registerTitle": { ar: "إنشاء حساب جديد", en: "Create an Account" },
+  "auth.registerSub": { ar: "أنشئي حساب لمتابعة طلباتك بسهولة", en: "Create an account to track your orders easily" },
+  "auth.labelName": { ar: "الاسم", en: "Name" },
+  "auth.phName": { ar: "اكتبي اسمك", en: "Enter your name" },
+  "auth.labelEmail": { ar: "البريد الإلكتروني", en: "Email" },
+  "auth.phEmail": { ar: "example@email.com", en: "example@email.com" },
+  "auth.labelPassword": { ar: "كلمة المرور", en: "Password" },
+  "auth.phPassword": { ar: "••••••••", en: "••••••••" },
+  "auth.loginBtn": { ar: "دخول", en: "Log In" },
+  "auth.loginSubmitting": { ar: "جاري الدخول...", en: "Logging in..." },
+  "auth.registerBtn": { ar: "إنشاء الحساب", en: "Create Account" },
+  "auth.registerSubmitting": { ar: "جاري الإنشاء...", en: "Creating..." },
+  "auth.noAccount": { ar: "معندكيش حساب؟", en: "Don't have an account?" },
+  "auth.haveAccount": { ar: "عندك حساب بالفعل؟", en: "Already have an account?" },
+  "auth.registerLink": { ar: "أنشئي واحد", en: "Sign up" },
+  "auth.loginLink": { ar: "سجّلي دخولك", en: "Log in" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

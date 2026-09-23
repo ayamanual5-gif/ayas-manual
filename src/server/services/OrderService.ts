@@ -11,6 +11,7 @@ function toOrder(row: {
   city: string;
   paymentMethod: string;
   paymentReference: string | null;
+  paymentProofUrl: string | null;
   items: unknown;
   subtotal: number;
   notes: string | null;
@@ -25,6 +26,7 @@ function toOrder(row: {
     city: row.city,
     paymentMethod: row.paymentMethod,
     paymentReference: row.paymentReference ?? undefined,
+    paymentProofUrl: row.paymentProofUrl ?? undefined,
     items: row.items as OrderItem[],
     subtotal: row.subtotal,
     notes: row.notes ?? undefined,
@@ -53,6 +55,7 @@ class PrismaOrderService implements StorageService<Order> {
         city: item.city,
         paymentMethod: item.paymentMethod,
         paymentReference: item.paymentReference,
+        paymentProofUrl: item.paymentProofUrl,
         items: item.items as unknown as Prisma.InputJsonValue,
         subtotal: item.subtotal,
         notes: item.notes,

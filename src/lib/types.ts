@@ -12,6 +12,7 @@ export interface Product {
   tint: ProductTint;
   price: number;
   isNew: boolean;
+  showInHero: boolean;
   name: LocalizedText;
   tag: LocalizedText;
   desc: LocalizedText;
@@ -42,6 +43,7 @@ export interface Order {
   city: string;
   paymentMethod: string;
   paymentReference?: string;
+  paymentProofUrl?: string;
   items: OrderItem[];
   subtotal: number;
   notes?: string;
@@ -76,6 +78,12 @@ export interface OrderPayload {
 export interface Settings {
   instapayHandle: string;
   vodafoneCashNumber: string;
+  whatsappNumber: string;
+  contactPhone: string;
+  contactEmail: string;
+  contactAddress: string;
+  socialInstagram: string;
+  socialPinterest: string;
 }
 
 export type Lang = "ar" | "en";

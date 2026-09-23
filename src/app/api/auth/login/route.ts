@@ -4,6 +4,9 @@ import type { NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS, signSessionToken, verifyPassword } from "@/server/adminAuth";
 import { userService } from "@/server/services/UserService";
 
+// Shared login for both roles — the customer-facing /login page and the
+// /admin/login page both call this. The caller decides where to redirect
+// based on the returned `role`.
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const { email, password } = body ?? {};
@@ -13,7 +16,7 @@ export async function POST(request: NextRequest) {
   }
 
   const user = await userService.findByEmail(email);
-  if (!user || user.role !== "ADMIN") {
+  if (!user) {
     return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
   }
 
@@ -29,5 +32,5 @@ export async function POST(request: NextRequest) {
     maxAge: 7 * 24 * 60 * 60,
   });
 
-  return NextResponse.json({ email: user.email });
+  return NextResponse.json({ id: user.id, email: user.email, name: user.name, role: user.role });
 }

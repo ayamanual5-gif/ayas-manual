@@ -199,12 +199,12 @@ function CarouselCard({
       className="carousel-card"
       style={{ width, zIndex, left: "50%" }}
       animate={{ x, scale, opacity }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      transition={{ type: "spring", stiffness: 260, damping: 32, mass: 0.7 }}
     >
       <div className="carousel-card-inner">
         {isActive ? (
           <Link href={`/shop/${product.id}`} className="carousel-card-image block" aria-label={product.name[lang]}>
-            <ProductVisual product={product} className="w-full h-full" />
+            <ProductVisual product={product} className="w-full h-full" eager={isActive} />
           </Link>
         ) : (
           <button

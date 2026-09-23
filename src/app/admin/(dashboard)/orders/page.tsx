@@ -110,6 +110,22 @@ export default function AdminOrdersPage() {
                         رقم العملية: {order.paymentReference}
                       </p>
                     )}
+                    {order.paymentProofUrl && (
+                      <a
+                        href={order.paymentProofUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 inline-block"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={order.paymentProofUrl}
+                          alt="إثبات التحويل"
+                          className="w-12 h-12 rounded-lg object-cover border"
+                          style={{ borderColor: "var(--beige-200)" }}
+                        />
+                      </a>
+                    )}
                   </td>
                   <td className="p-3">
                     <StatusSelect

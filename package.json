@@ -9,6 +9,7 @@
     "postinstall": "prisma generate",
     "seed": "tsx src/scripts/seed.ts",
     "hash-password": "tsx src/scripts/generateAdminHash.ts",
+    "migrate-admin": "tsx src/scripts/migrateAdminUser.ts",
     "db:push": "prisma db push",
     "db:studio": "prisma studio"
   },

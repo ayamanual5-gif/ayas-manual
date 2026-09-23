@@ -10,6 +10,7 @@ function toProduct(row: {
   tint: string;
   price: number;
   isNew: boolean;
+  showInHero: boolean;
   name: unknown;
   tag: unknown;
   desc: unknown;
@@ -22,6 +23,7 @@ function toProduct(row: {
     tint: row.tint as ProductTint,
     price: row.price,
     isNew: row.isNew,
+    showInHero: row.showInHero,
     name: row.name as LocalizedText,
     tag: row.tag as LocalizedText,
     desc: row.desc as LocalizedText,
