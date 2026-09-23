@@ -172,18 +172,6 @@ export default function CustomOrderSection({ categories }: { categories: Categor
                   </div>
                 )}
               </motion.div>
-
-              <div className="mt-6 card p-5">
-                <p className="text-sm font-semibold" style={{ color: "var(--teal)" }}>
-                  {t("custom.techTitle")}
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="chip">{t("tech1")}</span>
-                  <span className="chip">{t("tech2")}</span>
-                  <span className="chip">{t("tech3")}</span>
-                  <span className="chip">{t("tech4")}</span>
-                </div>
-              </div>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
