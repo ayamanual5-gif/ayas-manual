@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { fetchAdminSettings, updateAdminSettings } from "@/lib/adminApi";
+import { fetchAdminSettings, removeAboutImage, updateAdminSettings, uploadAboutImage } from "@/lib/adminApi";
+import { resolveImageUrl } from "@/lib/api";
 import { useToast } from "@/context/ToastContext";
 import type { Settings } from "@/lib/types";
 
@@ -13,6 +14,7 @@ const emptySettings: Settings = {
   contactEmail: "",
   socialInstagram: "",
   socialTiktok: "",
+  aboutImageUrl: "",
 };
 
 export default function AdminSettingsPage() {
@@ -21,6 +23,8 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [imageBusy, setImageBusy] = useState(false);
+  const aboutImageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchAdminSettings()
@@ -44,6 +48,33 @@ export default function AdminSettingsPage() {
       showToast(err instanceof Error ? err.message : "تعذر حفظ البيانات");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleAboutImageSelect(file: File | null | undefined) {
+    if (!file || !file.type.startsWith("image/")) return;
+    setImageBusy(true);
+    try {
+      const saved = await uploadAboutImage(file);
+      setForm(saved);
+      showToast("تم رفع الصورة");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "تعذر رفع الصورة");
+    } finally {
+      setImageBusy(false);
+    }
+  }
+
+  async function handleAboutImageRemove() {
+    setImageBusy(true);
+    try {
+      const saved = await removeAboutImage();
+      setForm(saved);
+      showToast("تم حذف الصورة");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "تعذر حذف الصورة");
+    } finally {
+      setImageBusy(false);
     }
   }
 
@@ -146,6 +177,61 @@ export default function AdminSettingsPage() {
             {saving ? "جاري الحفظ..." : "حفظ"}
           </button>
         </form>
+      )}
+
+      {!error && !loading && (
+        <div className="card p-6 space-y-4 mt-6 max-w-lg">
+          <h2 className="font-semibold" style={{ color: "var(--teal)" }}>
+            صورة صفحة &quot;من نحن&quot;
+          </h2>
+          <p className="text-xs -mt-2" style={{ color: "var(--ink-soft)" }}>
+            بتظهر جنب قصتنا في صفحة &quot;من نحن&quot;. لو مفيش صورة، هيظهر شكل تجميلي بدالها.
+          </p>
+
+          {form.aboutImageUrl && (
+            <div className="relative w-40">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={resolveImageUrl(form.aboutImageUrl)}
+                alt="صورة من نحن"
+                className="w-full aspect-[4/5] object-cover rounded-xl"
+              />
+              <button
+                type="button"
+                onClick={handleAboutImageRemove}
+                disabled={imageBusy}
+                className="absolute -top-2 -end-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold disabled:opacity-60"
+                style={{ background: "var(--rose)", color: "#fff" }}
+                aria-label="إزالة الصورة"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          <div
+            className="dropzone p-4 text-center cursor-pointer"
+            onClick={() => aboutImageInputRef.current?.click()}
+          >
+            <input
+              ref={aboutImageInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                handleAboutImageSelect(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
+              {imageBusy
+                ? "جاري الرفع..."
+                : form.aboutImageUrl
+                  ? "اضغطي لتغيير الصورة"
+                  : "اضغطي لرفع صورة"}
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

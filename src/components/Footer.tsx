@@ -21,6 +21,7 @@ const emptySettings: Settings = {
   contactEmail: "",
   socialInstagram: "",
   socialTiktok: "",
+  aboutImageUrl: "",
 };
 
 export default function Footer() {

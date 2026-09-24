@@ -90,4 +90,8 @@ model Settings {
   contactEmail       String @default("")
   socialInstagram    String @default("")
   socialTiktok       String @default("")
+  // R2 URL for the photo shown in the About page's image slot. Empty means
+  // no photo has been uploaded yet — the page falls back to a decorative
+  // illustration in that case.
+  aboutImageUrl      String @default("")
 }

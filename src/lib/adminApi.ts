@@ -153,3 +153,15 @@ export async function updateAdminSettings(data: Settings): Promise<Settings> {
   });
   return parseOrThrow(res);
 }
+
+export async function uploadAboutImage(file: File): Promise<Settings> {
+  const fd = new FormData();
+  fd.append("image", file);
+  const res = await adminFetch("/api/admin/settings/about-image", { method: "POST", body: fd });
+  return parseOrThrow(res);
+}
+
+export async function removeAboutImage(): Promise<Settings> {
+  const res = await adminFetch("/api/admin/settings/about-image", { method: "DELETE" });
+  return parseOrThrow(res);
+}

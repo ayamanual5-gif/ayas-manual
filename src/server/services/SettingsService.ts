@@ -10,6 +10,7 @@ const defaults: Settings = {
   contactEmail: "",
   socialInstagram: "",
   socialTiktok: "",
+  aboutImageUrl: "",
 };
 
 function toSettings(row: {
@@ -19,6 +20,7 @@ function toSettings(row: {
   contactEmail: string;
   socialInstagram: string;
   socialTiktok: string;
+  aboutImageUrl: string;
 }): Settings {
   return {
     instapayHandle: row.instapayHandle,
@@ -27,6 +29,7 @@ function toSettings(row: {
     contactEmail: row.contactEmail,
     socialInstagram: row.socialInstagram,
     socialTiktok: row.socialTiktok,
+    aboutImageUrl: row.aboutImageUrl,
   };
 }
 
