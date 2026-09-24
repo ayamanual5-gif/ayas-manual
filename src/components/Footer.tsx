@@ -92,7 +92,7 @@ export default function Footer() {
                   whileHover={{ y: -3, scale: 1.08 }}
                   whileTap={{ scale: 0.94 }}
                   className="w-9 h-9 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(245,235,215,.12)" }}
+                  style={{ background: "rgba(255,255,255,.12)" }}
                   aria-label={s.label}
                 >
                   <SocialIcon platform={s.platform} />
@@ -104,7 +104,7 @@ export default function Footer() {
       </Reveal>
       <div
         className="border-t py-5 text-center text-xs opacity-70"
-        style={{ borderColor: "rgba(245,235,215,.15)" }}
+        style={{ borderColor: "rgba(255,255,255,.15)" }}
       >
         <span>{t("footer.rights")}</span>
       </div>

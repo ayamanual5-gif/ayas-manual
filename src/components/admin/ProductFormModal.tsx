@@ -369,7 +369,7 @@ export default function ProductFormModal({
                           type="button"
                           onClick={() => makeCover(img.id)}
                           className="absolute bottom-1.5 start-1.5 w-6 h-6 rounded-full flex items-center justify-center"
-                          style={{ background: "rgba(251,243,226,.92)", color: "var(--teal)", border: "1px solid var(--beige-200)" }}
+                          style={{ background: "rgba(255,255,255,.92)", color: "var(--teal)", border: "1px solid var(--beige-200)" }}
                           title="اجعليها الصورة الرئيسية"
                           aria-label="اجعليها الصورة الرئيسية"
                         >

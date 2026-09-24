@@ -443,7 +443,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(251, 243, 226, 0.92);
+  background: rgba(255, 255, 255, 0.92);
   border: 1.5px solid var(--beige-200);
   color: var(--teal);
   box-shadow: 0 8px 20px -8px rgba(0, 80, 85, 0.4);

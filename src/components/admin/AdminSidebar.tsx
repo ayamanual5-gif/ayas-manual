@@ -88,7 +88,7 @@ export default function AdminSidebar({ onNavigate }: { onNavigate?: () => void }
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors"
               style={{
                 background: active ? "var(--teal)" : "transparent",
-                color: active ? "var(--beige-100)" : "rgba(245,235,215,.75)",
+                color: active ? "var(--beige-100)" : "rgba(255,255,255,.75)",
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -103,7 +103,7 @@ export default function AdminSidebar({ onNavigate }: { onNavigate?: () => void }
       <Link
         href="/"
         className="mx-3 mb-5 px-3 py-2.5 rounded-xl text-sm font-medium text-center"
-        style={{ border: "1px solid rgba(245,235,215,.25)", color: "rgba(245,235,215,.85)" }}
+        style={{ border: "1px solid rgba(255,255,255,.25)", color: "rgba(255,255,255,.85)" }}
       >
         عرض المتجر
       </Link>
