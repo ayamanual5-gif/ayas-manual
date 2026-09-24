@@ -16,7 +16,7 @@ export default function CategoryTabs({
   const { lang } = useLang();
 
   return (
-    <div className="mt-8 flex gap-2.5 overflow-x-auto pb-2 -mx-1 px-1">
+    <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-1 px-1">
       {categories.map((c) => {
         const isActive = active === c.key;
         return (

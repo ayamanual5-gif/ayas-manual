@@ -1,12 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLang } from "@/context/LangContext";
 import CategoryTabs from "./CategoryTabs";
 import ProductCard from "./ProductCard";
 import Reveal from "./motion/Reveal";
 import { StaggerContainer } from "./motion/Stagger";
+import ViewToggle, { type ShopViewMode } from "./ViewToggle";
 import type { Category, Product } from "@/lib/types";
+
+const VIEW_STORAGE_KEY = "shop-view-mode";
+
+const gridClass: Record<ShopViewMode, string> = {
+  compact: "grid-cols-2 lg:grid-cols-4",
+  large: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+};
 
 export default function ShopSection({
   products,
@@ -19,6 +27,19 @@ export default function ShopSection({
 }) {
   const { t } = useLang();
   const [activeCategory, setActiveCategory] = useState("all");
+  const [viewMode, setViewMode] = useState<ShopViewMode>("compact");
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
+    if (stored === "compact" || stored === "large") {
+      setViewMode(stored);
+    }
+  }, []);
+
+  const handleViewChange = (mode: ShopViewMode) => {
+    setViewMode(mode);
+    window.localStorage.setItem(VIEW_STORAGE_KEY, mode);
+  };
 
   const filtered = useMemo(
     () =>
@@ -48,16 +69,24 @@ export default function ShopSection({
         </p>
       ) : (
         <>
-          <CategoryTabs categories={categories} active={activeCategory} onChange={setActiveCategory} />
+          <div className="mt-8 flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex-1 min-w-0">
+              <CategoryTabs categories={categories} active={activeCategory} onChange={setActiveCategory} />
+            </div>
+            <ViewToggle value={viewMode} onChange={handleViewChange} />
+          </div>
 
           {filtered.length === 0 ? (
             <p className="mt-10 text-center" style={{ color: "var(--ink-soft)" }}>
               {t("shop.empty")}
             </p>
           ) : (
-            <StaggerContainer key={activeCategory} className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <StaggerContainer
+              key={`${activeCategory}-${viewMode}`}
+              className={`mt-8 grid ${gridClass[viewMode]} gap-5 transition-[grid-template-columns] duration-300 ease-in-out`}
+            >
               {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} size={viewMode} />
               ))}
             </StaggerContainer>
           )}

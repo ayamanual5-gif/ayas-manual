@@ -33,6 +33,8 @@ export const translations = {
     en: "Couldn't load products — make sure the backend server is running at http://localhost:4000",
   },
   "shop.empty": { ar: "مفيش منتجات في التصنيف ده حالياً.", en: "No products in this category yet." },
+  "shop.view.compact": { ar: "عرض مصغّر", en: "Compact view" },
+  "shop.view.large": { ar: "عرض كبير", en: "Large view" },
 
   "about.eyebrow": { ar: "قصتنا", en: "Our Story" },
   "about.title": { ar: "آية، من هواية لبراند", en: "Aya, From a Hobby to a Brand" },
