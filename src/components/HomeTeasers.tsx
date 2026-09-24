@@ -18,7 +18,7 @@ export default function HomeTeasers() {
             <h2 className="font-display mt-2 text-2xl sm:text-3xl" style={{ color: "var(--teal)" }}>
               {t("about.title")}
             </h2>
-            <p className="mt-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+            <p className="mt-3 leading-relaxed whitespace-pre-line" style={{ color: "var(--ink-soft)" }}>
               {t("about.body")}
             </p>
           </div>

@@ -35,10 +35,10 @@ export const translations = {
   "shop.empty": { ar: "مفيش منتجات في التصنيف ده حالياً.", en: "No products in this category yet." },
 
   "about.eyebrow": { ar: "قصتنا", en: "Our Story" },
-  "about.title": { ar: "آية، ومعمولة بإيدها", en: "Aya, and everything her hands weave" },
+  "about.title": { ar: "آية، من هواية لبراند", en: "Aya, From a Hobby to a Brand" },
   "about.body": {
-    ar: "بدأت آية بغرزة السلسلة الأولى في أوضتها، وكل قطعة دلوقتي بتاخد ساعات من الصبر والحب. مفيش قطعتين متطابقين — كل تصميم بيتعمل مرة واحدة بس، عشانك إنتي.",
-    en: "Aya started with a single chain stitch in her bedroom. Every piece today still takes hours of patience and care — no two pieces are ever identical, each one crocheted once, just for you.",
+    ar: "بدأت القصة بهواية بسيطة، زي ما كل قطعة كروشيه بتبدأ بمجرد خيط وابرة.\nومع الوقت كبرت بالحب والصبر ...\nمفيش قطعتين متطابقين — كل تصميم بيتعمل مرة واحدة بس، عشانك إنتي",
+    en: "It all began as a simple hobby, the way every crochet piece starts — with just a thread and a needle.\nOver time, it grew with love and patience...\nNo two pieces are ever identical — each design is made once, just for you.",
   },
 
   "custom.eyebrow": { ar: "طلب خاص", en: "Custom Order" },

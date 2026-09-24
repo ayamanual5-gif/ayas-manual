@@ -15,7 +15,7 @@ export default function AboutSection() {
         <h2 className="font-display mt-2 text-3xl sm:text-4xl" style={{ color: "var(--teal)" }}>
           {t("about.title")}
         </h2>
-        <p className="mt-4 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+        <p className="mt-4 leading-relaxed whitespace-pre-line" style={{ color: "var(--ink-soft)" }}>
           {t("about.body")}
         </p>
       </Reveal>
