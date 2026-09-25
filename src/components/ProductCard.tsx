@@ -39,7 +39,7 @@ export default function ProductCard({
     >
       <Link href={`/shop/${product.id}`} className="relative block overflow-hidden rounded-[18px]">
         <motion.div whileHover={{ scale: 1.06 }} transition={{ duration: 0.4, ease: EASE }}>
-          <ProductVisual product={product} className={large ? "h-64 sm:h-80 md:h-96" : ""} />
+          <ProductVisual product={product} className={large ? "w-full h-64 sm:h-80 md:h-96" : ""} />
         </motion.div>
         {product.isNew && (
           <span

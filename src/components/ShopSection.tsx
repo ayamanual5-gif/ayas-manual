@@ -81,11 +81,11 @@ export default function ShopSection({
         </p>
       ) : (
         <>
-          <div className="mt-8 flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex-1 min-w-0">
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="w-full sm:flex-1 sm:min-w-0">
               <CategoryTabs categories={categories} active={activeCategory} onChange={setActiveCategory} />
             </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center justify-between sm:justify-end gap-3 flex-shrink-0">
               <SortSelect value={sortMode} onChange={setSortMode} />
               <ViewToggle value={viewMode} onChange={handleViewChange} />
             </div>
