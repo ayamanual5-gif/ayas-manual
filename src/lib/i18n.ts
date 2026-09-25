@@ -35,6 +35,10 @@ export const translations = {
   "shop.empty": { ar: "مفيش منتجات في التصنيف ده حالياً.", en: "No products in this category yet." },
   "shop.view.compact": { ar: "عرض مصغّر", en: "Compact view" },
   "shop.view.large": { ar: "عرض كبير", en: "Large view" },
+  "shop.sort.default": { ar: "الترتيب الافتراضي", en: "Default order" },
+  "shop.sort.priceAsc": { ar: "السعر: من الأقل للأعلى", en: "Price: Low to High" },
+  "shop.sort.priceDesc": { ar: "السعر: من الأعلى للأقل", en: "Price: High to Low" },
+  "shop.sort.newest": { ar: "الأحدث", en: "Newest" },
 
   "about.eyebrow": { ar: "قصتنا", en: "Our Story" },
   "about.title": { ar: "آية، من هواية لبراند", en: "Aya, From a Hobby to a Brand" },

@@ -7,6 +7,8 @@ import ProductCard from "./ProductCard";
 import Reveal from "./motion/Reveal";
 import { StaggerContainer } from "./motion/Stagger";
 import ViewToggle, { type ShopViewMode } from "./ViewToggle";
+import SortSelect, { type SortMode } from "./SortSelect";
+import { getEffectivePrice } from "@/lib/pricing";
 import type { Category, Product } from "@/lib/types";
 
 const VIEW_STORAGE_KEY = "shop-view-mode";
@@ -28,6 +30,7 @@ export default function ShopSection({
   const { t } = useLang();
   const [activeCategory, setActiveCategory] = useState("all");
   const [viewMode, setViewMode] = useState<ShopViewMode>("compact");
+  const [sortMode, setSortMode] = useState<SortMode>("default");
 
   useEffect(() => {
     const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
@@ -48,6 +51,15 @@ export default function ShopSection({
         : products.filter((p) => p.category === activeCategory),
     [products, activeCategory]
   );
+
+  const sorted = useMemo(() => {
+    if (sortMode === "default") return filtered;
+    const copy = [...filtered];
+    if (sortMode === "priceAsc") copy.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
+    else if (sortMode === "priceDesc") copy.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
+    else if (sortMode === "newest") copy.sort((a, b) => b.id - a.id);
+    return copy;
+  }, [filtered, sortMode]);
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
@@ -73,7 +85,10 @@ export default function ShopSection({
             <div className="flex-1 min-w-0">
               <CategoryTabs categories={categories} active={activeCategory} onChange={setActiveCategory} />
             </div>
-            <ViewToggle value={viewMode} onChange={handleViewChange} />
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <SortSelect value={sortMode} onChange={setSortMode} />
+              <ViewToggle value={viewMode} onChange={handleViewChange} />
+            </div>
           </div>
 
           {filtered.length === 0 ? (
@@ -82,10 +97,10 @@ export default function ShopSection({
             </p>
           ) : (
             <StaggerContainer
-              key={`${activeCategory}-${viewMode}`}
+              key={`${activeCategory}-${viewMode}-${sortMode}`}
               className={`mt-8 grid ${gridClass[viewMode]} gap-5 transition-[grid-template-columns] duration-300 ease-in-out`}
             >
-              {filtered.map((product) => (
+              {sorted.map((product) => (
                 <ProductCard key={product.id} product={product} size={viewMode} />
               ))}
             </StaggerContainer>
